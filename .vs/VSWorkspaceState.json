@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\public",
+    "\\src",
+    "\\src\\app",
+    "\\src\\app\\books",
+    "\\src\\app\\bookshelf",
+    "\\src\\app\\books\\[slug]",
+    "\\src\\app\\library",
+    "\\src\\components",
+    "\\src\\db"
+  ],
+  "SelectedNode": "\\public",
+  "PreviewInSolutionExplorer": false
+}
