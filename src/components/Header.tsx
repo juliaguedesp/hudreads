@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -15,7 +16,6 @@ const navLinks = [
 export function Header() {
     const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
-    const [isClient] = useState(() => typeof window !== "undefined");
 
     // Auto-close dropdown if the user resizes to desktop view
     useEffect(() => {
@@ -72,20 +72,24 @@ export function Header() {
 
                 {/* Desktop Inline Navigation Links */}
                 <nav className="hidden md:flex items-center gap-4 sm:gap-6 overflow-x-auto no-scrollbar">
-                    {navLinks.map((link) => (
-                        <Link
-                            key={link.href}
-                            href={link.href}
-                            className={cn(
-                                "text-sm sm:text-base font-medium transition-opacity hover:opacity-60 whitespace-nowrap tracking-wide border-b-2 pb-0.5 transition-colors duration-200",
-                                isClient && pathname === link.href
-                                    ? "font-bold text-forest border-forest"
-                                    : "text-forest/80 border-transparent",
-                            )}
-                        >
-                            {link.label}
-                        </Link>
-                    ))}
+                    {navLinks.map((link) => {
+                        const isActive = pathname === link.href;
+
+                        return (
+                            <Link
+                                key={link.href}
+                                href={link.href}
+                                className={cn(
+                                    "text-lg sm:text-lg font-display transition-opacity hover:opacity-60 whitespace-nowrap tracking-wide border-b-2 pb-0.5 transition-colors duration-200",
+                                    isActive
+                                        ? "font-bold text-forest border-forest"
+                                        : "text-forest/80 border-transparent",
+                                )}
+                            >
+                                {link.label}
+                            </Link>
+                        );
+                    })}
                 </nav>
 
                 {/* Mobile Hamburger Button Trigger */}
@@ -107,21 +111,25 @@ export function Header() {
                 )}
             >
                 <nav className="flex flex-col p-4 space-y-2 bg-cream">
-                    {navLinks.map((link) => (
-                        <Link
-                            key={link.href}
-                            href={link.href}
-                            onClick={() => setIsOpen(false)}
-                            className={cn(
-                                "px-4 py-2 text-sm font-medium transition-all duration-200",
-                                isClient && pathname === link.href
-                                    ? "bg-forest/10 text-forest font-bold rounded-full"
-                                    : "text-forest/70 hover:text-forest hover:bg-forest/5 rounded-full"
-                            )}
-                        >
-                            {link.label}
-                        </Link>
-                    ))}
+                    {navLinks.map((link) => {
+                        const isActive = pathname === link.href;
+
+                        return (
+                            <Link
+                                key={link.href}
+                                href={link.href}
+                                onClick={() => setIsOpen(false)}
+                                className={cn(
+                                    "px-4 py-2 text-base font-display transition-all duration-200",
+                                    isActive
+                                        ? "bg-forest/10 text-forest font-bold rounded-full"
+                                        : "text-forest/70 hover:text-forest hover:bg-forest/5 rounded-full"
+                                )}
+                            >
+                                {link.label}
+                            </Link>
+                        );
+                    })}
                 </nav>
             </div>
         </header>

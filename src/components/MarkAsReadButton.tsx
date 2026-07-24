@@ -29,7 +29,7 @@ export function MarkAsReadButton({ slug, className }: Props) {
                 type="button"
                 disabled
                 className={cn(
-                    "inline-flex items-center gap-2 bg-forest/50 px-5 py-2.5 text-cream",
+                    "inline-flex items-center gap-2 bg-forest/50 px-5 py-2.5 text-cream font-display",
                     className,
                 )}
             >
@@ -44,9 +44,9 @@ export function MarkAsReadButton({ slug, className }: Props) {
             type="button"
             onClick={handleClick}
             className={cn(
-                "rounded-full inline-flex items-center gap-2 px-5 py-2.5 transition-all duration-200",
+                "rounded-full inline-flex items-center gap-2 px-5 py-2.5 font-display transition-all duration-200",
                 read
-                    ? "bg-tan text-forest hover:opacity-90"
+                    ? "bg-tan font-bold text-forest hover:opacity-90"
                     : "bg-forest text-cream hover:opacity-90",
                 className,
             )}

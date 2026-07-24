@@ -33,8 +33,7 @@ export function Button({
     external,
 }: ButtonProps) {
     const classes = cn(
-        // 🌟 Added 'rounded-full' here so it applies globally across all wrappers/states
-        "inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-200 sm:text-base",
+        "inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-md font-display transition-all duration-200 sm:text-base",
         variants[variant],
         disabled && "pointer-events-none opacity-50",
         className,

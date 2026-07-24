@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
@@ -12,7 +13,7 @@ const slides = [
         title: "Hudreads",
         description: "Every book Hudson Williams has ever recommended — with community reviews, monthly picks, and your personal reading tracker.",
         cta: "Browse the library",
-        bgClass: "bg-tan",
+        bgClass: "bg-forest",
         textClass: "text-cream",
         mutedClass: "text-cream/70",
         backgroundUrl: "/hero1.gif",
@@ -24,7 +25,7 @@ const slides = [
         title: "Your Bookshelf",
         description: "Mark books as read and download a beautiful image of your personal Hudson-inspired bookshelf.",
         cta: "View bookshelf",
-        bgClass: "bg-tan",
+        bgClass: "bg-forest",
         textClass: "text-cream",
         mutedClass: "text-cream/70",
         backgroundUrl: "/hero4.gif",
@@ -36,7 +37,7 @@ const slides = [
         title: "Book of the Month",
         description: "Check what the HudBookClub is reading this month and hop into the Discord discussion.",
         cta: "See this month's pick",
-        bgClass: "bg-tan",
+        bgClass: "bg-forest",
         textClass: "text-cream",
         mutedClass: "text-cream/70",
         backgroundUrl: "/hero2.gif",
@@ -60,7 +61,7 @@ export function HeroCarousel({ className, staticSlideId }: Props) {
 
         const timer = setInterval(() => {
             setActive((prev) => (prev + 1) % slides.length);
-        }, 3000);
+        }, 4000);
         return () => clearInterval(timer);
     }, [staticSlideId]);
 
@@ -72,15 +73,14 @@ export function HeroCarousel({ className, staticSlideId }: Props) {
         setActive((prev) => (prev + 1) % slides.length);
     };
 
-    // 🛠️ SAFE SAFEGUARD: Added fallback array selector to fully neutralize undefined parsing errors
     const currentSlide = slides[active] || slides[0];
 
     return (
-        <section className={cn("w-full bg-cream", className)}>
-            {/* Carousel Slide Track Window */}
-            <div className="relative overflow-hidden w-full">
+        <section className={cn("w-full bg-cream flex flex-col justify-between overflow-hidden", className)} style={{ minHeight: "calc(100vh - var(--header-height, 70px))" }}>
+            {/* Carousel Slide Track Window - takes up remaining vertical space */}
+            <div className="relative flex-1 w-full flex items-center overflow-hidden">
                 <div
-                    className="flex transition-transform duration-700 ease-in-out"
+                    className="absolute inset-0 flex transition-transform duration-700 ease-in-out"
                     style={{ transform: `translateX(-${active * 100}%)` }}
                 >
                     {slides.map((slide) => {
@@ -88,7 +88,7 @@ export function HeroCarousel({ className, staticSlideId }: Props) {
                             <div
                                 key={slide.id}
                                 className={cn(
-                                    "relative min-w-full px-4 py-16 sm:px-12 md:px-24 sm:py-20 md:py-24 transition-colors duration-500",
+                                    "relative min-w-full h-full flex items-center px-6 sm:px-12 md:px-24 py-12 transition-colors duration-500",
                                     slide.bgClass,
                                     slide.textClass
                                 )}
@@ -118,7 +118,7 @@ export function HeroCarousel({ className, staticSlideId }: Props) {
                                     />
                                 )}
 
-                                <div className="relative mx-auto max-w-6xl flex justify-between items-center gap-8">
+                                <div className="relative mx-auto max-w-6xl w-full flex justify-between items-center gap-8">
                                     <div className="max-w-3xl">
                                         {slide.eyebrow && (
                                             <p className={cn("mb-3 text-sm font-medium uppercase tracking-[0.2em]", slide.mutedClass)}>
@@ -182,9 +182,9 @@ export function HeroCarousel({ className, staticSlideId }: Props) {
                 )}
             </div>
 
-            {/* Pagination Indicators Only */}
+            {/* Compact Pagination Indicators at the bottom edge */}
             {!staticSlideId && (
-                <div className="mx-auto max-w-6xl px-4 mt-4 mb-6 sm:px-6 flex items-center justify-center">
+                <div className="w-full bg-cream py-3 flex items-center justify-center shrink-0 z-10">
                     <div className="flex gap-2">
                         {slides.map((_, i) => (
                             <button

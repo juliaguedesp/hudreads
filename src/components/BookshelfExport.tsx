@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import html2canvas from "html2canvas";
 import { Save, BookCheck, CirclePercent } from "lucide-react";
@@ -14,16 +14,12 @@ type Props = {
 };
 
 export function BookshelfExport({ allBooks }: Props) {
-    const [readSlugs, setReadSlugs] = useState<string[] | null>(null);
+    const [readSlugs] = useState<string[]>(() => {
+        if (typeof window === "undefined") return [];
+        return getReadBookSlugs() || [];
+    });
+
     const exportRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        queueMicrotask(() => {
-            setReadSlugs(getReadBookSlugs() || []);
-        });
-    }, []);
-
-    if (readSlugs === null) return null;
 
     const readBooks = allBooks.filter((b) => readSlugs.includes(b.slug));
 
@@ -39,6 +35,7 @@ export function BookshelfExport({ allBooks }: Props) {
         const canvas = await html2canvas(exportRef.current, {
             backgroundColor: "#F5F0E8",
             scale: 2,
+            useCORS: true,
         });
         const link = document.createElement("a");
         link.download = "my-hudreads-bookshelf.png";
@@ -64,85 +61,165 @@ export function BookshelfExport({ allBooks }: Props) {
         );
     }
 
+    // Split books into rows of up to 4 books per shelf compartment
+    const shelves: Book[][] = [];
+    for (let i = 0; i < readBooks.length; i += 4) {
+        shelves.push(readBooks.slice(i, i + 4));
+    }
+
     return (
         <div>
-            {/* 📈 Stats Display Grid */}
-            <div className="mb-4 grid grid-cols-2 gap-3 sm:gap-4">
+            {/* 📈 Summary Block */}
+            <div className="mb-6 pb-6 border-b border-forest/10 flex flex-col items-center w-full">
+                <table
+                    style={{
+                        display: "table",
+                        width: "auto",
+                        margin: "0 auto",
+                        borderCollapse: "collapse"
+                    }}
+                >
+                    <tbody>
+                        <tr style={{ display: "table-row" }}>
+                            {/* Pages Read Cell */}
+                            <td style={{ display: "table-cell", verticalAlign: "middle", paddingRight: "12px" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "6px" }} className="text-forest">
+                                    <BookCheck className="h-4 w-4 text-forest/50 shrink-0" />
+                                    <span className="font-serif text-xs lg:text-xs text-forest/50 whitespace-nowrap">
+                                        <strong className="font-bold">{totalPagesRead.toLocaleString()}</strong> pages read
+                                    </span>
+                                </div>
+                            </td>
 
-                {/* Total Pages Card */}
-                <div className="flex flex-col items-center justify-center text-center rounded-xl border border-forest/10 bg-beige-dark p-4 sm:p-6 shadow-sm space-y-1.5 sm:space-y-2">
-                    <div className="rounded-xl sm:rounded-2xl bg-tan/70 p-2 sm:p-3 text-forest/70">
-                        <BookCheck className="h-5 w-5 sm:h-6 sm:w-6" />
-                    </div>
-                    <div>
-                        <p className="text-s sm:text-sm font-medium text-forest/60">Total Pages Read</p>
-                        <p className="font-display text-xl sm:text-2xl font-bold text-forest mt-0.5">
-                            {totalPagesRead.toLocaleString()}
-                        </p>
-                    </div>
-                </div>
+                            {/* Separator Dot Cell */}
+                            <td style={{ display: "table-cell", verticalAlign: "middle", paddingRight: "12px" }}>
+                                <span className="text-forest/30 text-xs select-none">•</span>
+                            </td>
 
-                {/* Library Completed Card */}
-                <div className="flex flex-col items-center justify-center text-center rounded-xl border border-forest/10 bg-beige-dark p-4 sm:p-6 shadow-sm space-y-1.5 sm:space-y-2">
-                    <div className="rounded-xl sm:rounded-2xl bg-tan/70 p-2 sm:p-3 text-forest/70 ">
-                        <CirclePercent className="h-5 w-5 sm:h-6 sm:w-6" />
-                    </div>
-                    <div>
-                        <p className="text-s sm:text-sm font-medium text-forest/60">Library Completed</p>
-                        <p className="font-display text-xl sm:text-2xl font-bold text-forest mt-0.5">
-                            {libraryPercentage}%
-                        </p>
-                    </div>
-                </div>
+                            {/* Completed Library Cell */}
+                            <td style={{ display: "table-cell", verticalAlign: "middle" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "6px" }} className="text-forest">
+                                    <CirclePercent className="h-4 w-4 text-forest/50 shrink-0" />
+                                    <span className="font-serif text-xs sm:text-xs text-forest/50 whitespace-nowrap">
+                                        <strong className="font-bold">{libraryPercentage}%</strong> of library completed
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
 
-            {/* Action Header bar */}
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
-                <Button onClick={handleDownload} icon={Save}>
-                    Download bookshelf image
-                </Button>
-            </div>
-
-            {/* Display Shelf Grid */}
+            {/* Display Shelf Grid on Website */}
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                 {readBooks.map((book) => (
                     <BookCard key={book.id} book={book} />
                 ))}
             </div>
 
-            {/* Hidden block for PNG Generator */}
+            {/* Download Button Section */}
+            <div className="mt-10 flex flex-col items-center w-full">
+                <Button
+                    onClick={handleDownload}
+                    icon={Save}
+                    className="w-[240px] text-xs py-2.5 flex justify-center"
+                >
+                    Download Bookshelf
+                </Button>
+            </div>
+
+            {/* Hidden Realistic Cabinet PNG Generator Container */}
             <div className="pointer-events-none fixed -left-[9999px] top-0">
                 <div
                     ref={exportRef}
-                    className="w-[900px] bg-cream p-10"
-                    style={{ fontFamily: "var(--font-serif)" }}
+                    style={{
+                        width: "800px",
+                        height: "1050px",
+                        backgroundColor: "#F5F0E8",
+                        position: "relative",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        justifyContent: "flex-end",
+                        paddingBottom: "35px",
+                    }}
                 >
-                    <p className="text-xs uppercase tracking-[0.2em] text-forest/50">
-                        My hudreads bookshelf
-                    </p>
-                    <h2 className="mt-2 font-display text-3xl font-bold text-forest">
-                        Books I&apos;ve read
-                    </h2>
-                    <div className="mt-8 grid grid-cols-5 gap-4">
-                        {readBooks.map((book) => (
-                            <div key={book.id}>
-                                <div className="relative aspect-[2/3] overflow-hidden bg-beige-dark shadow-md">
-                                    {book.coverUrl && (
-                                        // eslint-disable-next-line @next/next/no-img-element
-                                        <img
-                                            src={book.coverUrl}
-                                            alt={book.title}
-                                            className="h-full w-full object-cover"
-                                        />
-                                    )}
-                                </div>
-                                <p className="mt-2 text-xs font-semibold text-forest line-clamp-2">
-                                    {book.title}
-                                </p>
-                            </div>
-                        ))}
+                    {/* Header Title with inverted dark forest text */}
+                    <div style={{ position: "absolute", top: "35px", width: "100%", textAlign: "center" }}>
+                        <h2 style={{ fontSize: "20px", fontFamily: "serif", fontWeight: "600", letterSpacing: "0.2em", color: "#1A2E26", margin: 0, textTransform: "uppercase" }}>
+                            MY HUDREADS BOOKSHELF
+                        </h2>
                     </div>
-                    <p className="mt-10 text-center text-sm text-forest/40">hudreads</p>
+
+                    {/* Bookshelf Background Image Container */}
+                    <div
+                        style={{
+                            width: "720px",
+                            height: "920px",
+                            position: "relative",
+                            backgroundImage: `url('/bookshelf-bg.png')`,
+                            backgroundSize: "contain",
+                            backgroundRepeat: "no-repeat",
+                            backgroundPosition: "center",
+                        }}
+                    >
+                        {/* Render up to 5 shelf rows adjusted down to sit squarely on the wood shelves */}
+                        {shelves.slice(0, 5).map((shelfBooks, shelfIndex) => {
+                            const shelfTops = ["230px", "395px", "560px", "725px", "890px"];
+                            const topCoord = shelfTops[shelfIndex] || "230px";
+
+                            return (
+                                <div
+                                    key={shelfIndex}
+                                    style={{
+                                        position: "absolute",
+                                        top: topCoord,
+                                        left: "90px",
+                                        right: "90px",
+                                        height: "130px",
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        alignItems: "flex-end",
+                                        gap: "28px",
+                                    }}
+                                >
+                                    {shelfBooks.map((book) => (
+                                        <div
+                                            key={book.id}
+                                            style={{
+                                                width: "85px",
+                                                display: "flex",
+                                                flexDirection: "column",
+                                                alignItems: "center",
+                                            }}
+                                        >
+                                            <div
+                                                style={{
+                                                    width: "85px",
+                                                    height: "122px",
+                                                    position: "relative",
+                                                    backgroundColor: "#3E2723",
+                                                    boxShadow: "-4px 8px 14px rgba(0, 0, 0, 0.5), 2px 2px 4px rgba(0, 0, 0, 0.3)",
+                                                    borderRadius: "2px",
+                                                    overflow: "hidden",
+                                                }}
+                                            >
+                                                {book.coverUrl && (
+                                                    // eslint-disable-next-line @next/next/no-img-element
+                                                    <img
+                                                        src={book.coverUrl}
+                                                        alt={book.title}
+                                                        style={{ height: "100%", width: "100%", objectFit: "cover" }}
+                                                        crossOrigin="anonymous"
+                                                    />
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
-import { Courier_Prime, Cormorant_Garamond } from "next/font/google"; // 🛠️ Swapped to Courier_Prime
+import { Courier_Prime, Cormorant_Garamond } from "next/font/google";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import "./globals.css";
 
-// 🛠️ Courier Prime configured for body text
 const courierPrime = Courier_Prime({
     weight: ["400", "700"],
-    variable: "--font-serif", // Keeping this mapped to your baseline body styles
+    variable: "--font-serif",
     subsets: ["latin"],
     style: ["normal", "italic"],
     display: "swap",
@@ -21,27 +20,18 @@ const cormorantGaramond = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-    title: {
-        default: "Hudreads",
-        template: "%s",
-    },
-    description:
-        "Every book Hudson Williams has ever recommended — with community reviews, monthly picks, and your personal reading tracker.",
+    title: { default: "Hudreads", template: "%s" },
+    description: "Every book Hudson Williams has ever recommended.",
 };
 
-export default function RootLayout({
-    children,
-}: Readonly<{
-    children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
-        <html
-            lang="en"
-            className={`${courierPrime.variable} ${cormorantGaramond.variable} min-h-screen antialiased`}
-        >
+        <html lang="en" className={`${courierPrime.variable} ${cormorantGaramond.variable} antialiased`}>
             <body className="flex min-h-screen flex-col bg-cream font-serif text-forest">
                 <Header />
-                <main className="flex-1">{children}</main>
+                <main className="flex-1 w-full">
+                    {children}
+                </main>
                 <Footer />
             </body>
         </html>

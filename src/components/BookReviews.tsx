@@ -59,7 +59,7 @@ export function BookReviews({ bookId, initialReviews, isAdmin }: Props) {
 
             {/* Right Column Component Layout Area: The Community Feed */}
             <div className="w-full min-w-0 h-fit" style={{ width: "100%", minWidth: 0, height: "fit-content" }}>
-                <h3 className="mb-4 font-display text-xl font-bold text-forest">
+                <h3 className="mb-4 font-serif text-lg font-medium text-forest">
                     Community reviews ({reviews.length})
                 </h3>
                 <ReviewList reviews={reviews} isAdmin={isAdmin} onChanged={refresh} />

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { Sparkles } from "lucide-react"; // 🛠️ Cleaned up unused Anchor and Library icons
+import { Sparkles } from "lucide-react";
 import { HeroBanner } from "@/components/HeroBanner";
 import { MarkAsReadButton } from "@/components/MarkAsReadButton";
 import { BookReviews } from "@/components/BookReviews";
@@ -59,6 +59,11 @@ export default async function BookPage({ params }: Props) {
             ? (book.genre as string).split(",")[0].trim()
             : "Recommended read";
 
+    // Split synopsis safely into discrete paragraphs to preserve structure
+    const synopsisParagraphs = book.synopsis
+        ? book.synopsis.split(/\r?\n/).filter((p) => p.trim() !== "")
+        : [];
+
     return (
         <>
             <HeroBanner eyebrow={primaryEyebrow} title={book.title} />
@@ -95,9 +100,9 @@ export default async function BookPage({ params }: Props) {
                         <div className="space-y-6">
                             <div>
                                 <h1 className="font-display text-4xl font-bold text-forest">{book.title}</h1>
-                                <p className="text-xl text-forest/60 py-0.5 font-display italic mt-1">
+                                <p className="text-xl text-forest/60 py-0.5 font-serif italic mt-1">
                                     by {book.author}
-                                    {book.publishedYear && <span className="text-forest/80 font-sans not-italic text-sm ml-2"> • {book.publishedYear}</span>}
+                                    {book.publishedYear && <span className="text-forest/80 font-serif not-italic text-sm ml-2"> • {book.publishedYear}</span>}
                                 </p>
 
                                 <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -110,25 +115,29 @@ export default async function BookPage({ params }: Props) {
                                         .map((individualGenre: string, index: number) => (
                                             <span
                                                 key={index}
-                                                className="rounded-full bg-forest border border-forest/[0.02] px-3 py-1.5 text-xs font-medium text-cream shadow-sm"
+                                                className="rounded-full bg-forest border border-forest/[0.02] px-3 py-1.5 text-sm font-display font-medium text-cream shadow-sm"
                                             >
                                                 {individualGenre}
                                             </span>
                                         ))}
 
                                     {book.pageCount && (
-                                        <span className="rounded-full bg-tan border border-forest/[0.02] px-3 py-1.5 font-bold text-xs font-medium text-forest/80 shadow-sm">
+                                        <span className="rounded-full bg-tan border border-forest/[0.02] px-3 py-1.5 font-serif font-bold text-xs text-forest/80 shadow-sm">
                                             {book.pageCount} pages
                                         </span>
                                     )}
                                 </div>
                             </div>
 
-                            {/* Synopsis Text Block */}
-                            {book.synopsis && (
+                            {/* Synopsis Text Block with Restored Justification */}
+                            {synopsisParagraphs.length > 0 && (
                                 <div className="pt-2">
-                                    <h3 className="font-display text-xl font-bold text-forest mb-2">Synopsis</h3>
-                                    <p className="text-justify leading-relaxed text-forest/80 text-base font-serif">{book.synopsis}</p>
+                                    <h3 className="font-serif text-xl font-medium text-forest mb-2">Synopsis</h3>
+                                    <div className="space-y-4 text-justify leading-normal text-forest/80 text-xl font-display">
+                                        {synopsisParagraphs.map((paragraph, index) => (
+                                            <p key={index}>{paragraph}</p>
+                                        ))}
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -140,11 +149,11 @@ export default async function BookPage({ params }: Props) {
                                 <div className="rounded-xl border border-forest/10 bg-white p-6 shadow-sm">
                                     <div className="flex items-center gap-2 text-forest">
                                         <Sparkles size={18} className="text-tan" />
-                                        <h2 className="font-display text-base font-bold">
-                                            Hudson & this book
+                                        <h2 className="font-display text-forest text-lg font-bold">
+                                            Hudson & {book.title}
                                         </h2>
                                     </div>
-                                    <p className="mt-3 text-sm align-justify leading-relaxed text-forest/80">
+                                    <p className="mt-3 font-serif text-sm align-justify leading-relaxed text-forest/70">
                                         {book.hudsonReference}
                                     </p>
                                 </div>

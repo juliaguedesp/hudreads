@@ -115,7 +115,7 @@ export default async function BookOfMonthPage() {
 
                         <div className="mt-8 flex flex-wrap gap-4">
                             <Button
-                                href={bom.discordLink}
+                                href="https://x.com/hudsbookclub"
                                 variant="secondary"
                                 icon={MessageCircleHeart}
                                 external

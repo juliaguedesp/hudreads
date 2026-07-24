@@ -11,7 +11,7 @@ export function BookCard({ book }: Props) {
     return (
         <Link
             href={`/books/${book.slug}`}
-            className="group flex flex-col w-full overflow-hidden rounded-xl border border-forest/10 bg-white transition-all hover:border-forest/25 hover:shadow-md"
+            className="group flex flex-col w-full overflow-hidden rounded-none border border-forest/10 bg-white transition-all hover:border-forest/25 hover:shadow-md"
         >
             {/* Cover Container: Enforces a perfect 2:3 book ratio across all devices */}
             <div className="relative aspect-[2/3] w-full bg-beige-dark">

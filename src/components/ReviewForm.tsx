@@ -94,13 +94,13 @@ export function ReviewForm({ bookId, onSubmitted }: Props) {
 
     return (
         <form onSubmit={handleSubmit} className="space-y-5 border border-forest/5 bg-white p-6 rounded-xl shadow-sm">
-            <h3 className="font-display text-lg font-bold text-forest">
+            <h3 className="font-serif text-lg text-forest">
                 Leave a review
             </h3>
 
             <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                    <label className="rounded-xl block text-sm font-medium tracking-wider text-forest/70">
+                    <label className="rounded-xl block text-xs font-medium tracking-wider text-forest/70">
                         Your name <span className="text-red-600">*</span>
                     </label>
                     <input
@@ -108,31 +108,31 @@ export function ReviewForm({ bookId, onSubmitted }: Props) {
                         onChange={(e) => setName(e.target.value)}
                         required
                         placeholder="Your name"
-                        className="mt-1.5 w-full rounded-xl border border-forest/10 bg-forest/[0.04] px-3 py-2.5 text-sm text-forest placeholder-forest/40 outline-none transition-colors focus:bg-forest/[0.06] focus:border-forest/20"
+                        className="mt-1.5 w-full rounded-xl border border-forest/10 bg-forest/[0.04] px-3 py-2.5 font-display text-sm text-forest placeholder-forest/40 outline-none transition-colors focus:bg-forest/[0.06] focus:border-forest/20"
                     />
                 </div>
                 <div>
-                    <label className="rounded-xl block text-sm font-medium tracking-wider text-forest/70">
-                        Twitter / X username <span className="text-red-600">*</span>
+                    <label className="rounded-xl block text-xs font-medium tracking-wider text-forest/70">
+                        Twitter/X username <span className="text-red-600">*</span>
                     </label>
                     <input
                         value={twitter}
                         onChange={(e) => setTwitter(e.target.value)}
                         placeholder="@twitter"
                         required
-                        className="mt-1.5 w-full rounded-xl border border-forest/10 bg-forest/[0.04] px-3 py-2.5 text-sm text-forest placeholder-forest/40 outline-none transition-colors focus:bg-forest/[0.06] focus:border-forest/20"
+                        className="mt-1.5 w-full rounded-xl border border-forest/10 bg-forest/[0.04] px-3 py-2.5 font-display text-sm text-forest placeholder-forest/40 outline-none transition-colors focus:bg-forest/[0.06] focus:border-forest/20"
                     />
                 </div>
             </div>
 
             <div>
-                <label className="rounded-xl block text-sm font-medium tracking-wider text-forest/70">
+                <label className="rounded-xl block text-xs font-medium tracking-wider text-forest/70">
                     How did you read it?
                 </label>
                 <select
                     value={readingFormat}
                     onChange={(e) => setReadingFormat(e.target.value)}
-                    className="mt-1.5 w-full rounded-xl border border-forest/10 bg-forest/[0.04] px-3 py-2.5 text-sm text-forest outline-none transition-colors focus:bg-forest/[0.06] focus:border-forest/20"
+                    className="mt-1.5 w-full rounded-xl border border-forest/10 bg-forest/[0.04] px-3 py-2.5 font-display text-sm text-forest outline-none transition-colors focus:bg-forest/[0.06] focus:border-forest/20"
                 >
                     <option value="" className="bg-white">Select format</option>
                     {Object.entries(READING_FORMAT_LABELS).map(([value, label]) => (
@@ -144,7 +144,7 @@ export function ReviewForm({ bookId, onSubmitted }: Props) {
             </div>
 
             <div>
-                <label className="block text-sm font-medium tracking-wider text-forest/70">
+                <label className="block text-xs font-medium tracking-wider text-forest/70">
                     Rating <span className="text-red-600">*</span>
                 </label>
                 <div className="mt-1">
@@ -154,11 +154,11 @@ export function ReviewForm({ bookId, onSubmitted }: Props) {
 
             {/* 🛠️ Quill Rich Text Editor */}
             <div className="quill-input-container">
-                <label className="rounded-xl block text-sm font-medium tracking-wider text-forest/70 mb-2">
+                <label className="rounded-xl block text-xs font-medium tracking-wider text-forest/70 mb-2">
                     Your review
                 </label>
 
-                <div className="overflow-hidden rounded-xl border border-forest/10 bg-forest/[0.04] focus-within:bg-forest/[0.06] focus-within:border-forest/20 transition-colors">
+                <div className="overflow-hidden rounded-xl border border-forest/10 bg-forest/[0.04] font-display focus-within:bg-forest/[0.06] focus-within:border-forest/20 transition-colors">
                     <ReactQuill
                         theme="snow"
                         value={reviewText}

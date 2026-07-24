@@ -25,12 +25,12 @@ export function Footer() {
                     <button
                         type="button"
                         onClick={handleLogoClick}
-                        className="font-display text-lg font-semibold text-forest transition-opacity hover:opacity-60"
+                        className="font-serif text-lg text-forest transition-opacity hover:opacity-60"
                         aria-label="Hudreads"
                     >
                         HUDREADS
                     </button>
-                    <p className="mx-auto mt-2 max-w-xl text-xs leading-relaxed text-forest/60">
+                    <p className="font-serif mx-auto max-w-xl text-xs leading-relaxed text-forest/60">
                         A fan-made reading community for Hudson Williams fans. Not
                         affiliated with Hudson or his team.
                     </p>
