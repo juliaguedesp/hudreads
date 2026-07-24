@@ -1,13 +1,14 @@
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { reviews } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { NextResponse } from "next/server";
 
 export async function PATCH(
-    req: Request,
-    { params }: { params: { id: string } }
+    req: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         const body = await req.json();
         const { name, twitter, readingFormat, rating, reviewText, editToken } = body;
 
@@ -21,9 +22,9 @@ export async function PATCH(
                 readingFormat,
                 rating,
                 reviewText: cleanReviewText,
-                editToken: editToken, // ✨ Garante que o token existente continue associado
+                editToken: editToken,
             })
-            .where(eq(reviews.id, params.id));
+            .where(eq(reviews.id, id));
 
         return NextResponse.json({ success: true });
     } catch (error) {
