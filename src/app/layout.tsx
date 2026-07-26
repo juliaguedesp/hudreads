@@ -22,6 +22,9 @@ const cormorantGaramond = Cormorant_Garamond({
 export const metadata: Metadata = {
     title: { default: "Hudreads", template: "%s" },
     description: "Every book Hudson Williams has ever recommended.",
+    icons: {
+        icon: "/favicon.ico", // Adjust path/extension if your logo is e.g. "/icon.png" or "/logo.svg" in public/
+    },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

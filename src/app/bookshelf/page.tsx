@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { HeroBanner } from "@/components/HeroBanner";
 import { BookshelfExport } from "@/components/BookshelfExport";
 import { getAllBooks } from "@/lib/queries";
@@ -19,11 +20,12 @@ export default async function BookshelfPage() {
 
     return (
         <>
-            <HeroBanner eyebrow="Your reading history" title="Bookshelf" />
+            <HeroBanner title="Bookshelf" />
 
-            {/* 🛠️ ADJUSTED: Relaxed top padding to pt-6 on mobile and sm:pt-10 on desktop for a cleaner look */}
-            <section className="mx-auto max-w-6xl px-4 pt-6 pb-10 sm:px-6 sm:pt-10 sm:pb-14">
-                <BookshelfExport allBooks={books} />
+            <section className="mx-auto max-w-6xl px-4 pt-3 pb-10 sm:px-6 sm:pt-3 sm:pb-14">
+                <Suspense fallback={<div className="text-center py-12 text-forest/50">Loading bookshelf...</div>}>
+                    <BookshelfExport allBooks={JSON.parse(JSON.stringify(books))} />
+                </Suspense>
             </section>
         </>
     );

@@ -2,18 +2,18 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { Library, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const slides = [
     {
         id: "library",
         href: "/library",
-        eyebrow: "A reading community",
+        eyebrow: "Browse our collection",
         title: "Hudreads",
         description: "Every book Hudson Williams has ever recommended — with community reviews, monthly picks, and your personal reading tracker.",
         cta: "Browse the library",
-        bgClass: "bg-forest",
+        bgClass: "bg-tan",
         textClass: "text-cream",
         mutedClass: "text-cream/70",
         backgroundUrl: "/hero1.gif",
@@ -21,11 +21,11 @@ const slides = [
     {
         id: "bookshelf",
         href: "/bookshelf",
-        eyebrow: "Track what you've read",
+        eyebrow: "Track Your Reading",
         title: "Your Bookshelf",
         description: "Mark books as read and download a beautiful image of your personal Hudson-inspired bookshelf.",
         cta: "View bookshelf",
-        bgClass: "bg-forest",
+        bgClass: "bg-tan",
         textClass: "text-cream",
         mutedClass: "text-cream/70",
         backgroundUrl: "/hero4.gif",
@@ -37,7 +37,7 @@ const slides = [
         title: "Book of the Month",
         description: "Check what the HudBookClub is reading this month and hop into the Discord discussion.",
         cta: "See this month's pick",
-        bgClass: "bg-forest",
+        bgClass: "bg-tan",
         textClass: "text-cream",
         mutedClass: "text-cream/70",
         backgroundUrl: "/hero2.gif",

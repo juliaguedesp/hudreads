@@ -66,7 +66,6 @@ export default async function BookPage({ params }: Props) {
 
     return (
         <>
-            <HeroBanner eyebrow={primaryEyebrow} title={book.title} />
             <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
                 <div className="grid gap-10 lg:grid-cols-[240px_1fr]">
 
