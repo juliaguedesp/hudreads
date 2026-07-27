@@ -44,7 +44,7 @@ export function BookshelfExport({ allBooks }: Props) {
         try {
             setIsExporting(true);
             const canvas = await html2canvas(exportRef.current, {
-                backgroundColor: "#1A2E26", // Rich Forest Green
+                backgroundColor: "#1A2E26",
                 scale: 2,
                 useCORS: true,
             });
@@ -101,8 +101,8 @@ export function BookshelfExport({ allBooks }: Props) {
                                         }}
                                         className="text-forest"
                                     >
-                                        <BookCheck className="h-4 w-4 text-forest/50 shrink-0" />
-                                        <span className="font-serif text-xs lg:text-xs text-forest/50 whitespace-nowrap">
+                                        <BookCheck className="h-4 w-4 text-forest/80 shrink-0" />
+                                        <span className="font-serif text-xs lg:text-xs text-forest whitespace-nowrap">
                                             <strong className="font-bold">
                                                 {totalPagesRead.toLocaleString()}
                                             </strong>{" "}
@@ -137,8 +137,8 @@ export function BookshelfExport({ allBooks }: Props) {
                                         }}
                                         className="text-forest"
                                     >
-                                        <CirclePercent className="h-4 w-4 text-forest/50 shrink-0" />
-                                        <span className="font-serif text-xs sm:text-xs text-forest/50 whitespace-nowrap">
+                                        <CirclePercent className="h-4 w-4 text-forest/80 shrink-0" />
+                                        <span className="font-serif text-xs sm:text-xs text-forest whitespace-nowrap">
                                             <strong className="font-bold">
                                                 {libraryPercentage}%
                                             </strong>{" "}
@@ -189,8 +189,8 @@ export function BookshelfExport({ allBooks }: Props) {
                                     style={{ display: "flex", alignItems: "center", gap: "6px" }}
                                     className="text-forest"
                                 >
-                                    <BookCheck className="h-4 w-4 text-forest/50 shrink-0" />
-                                    <span className="font-serif text-xs lg:text-xs text-forest/50 whitespace-nowrap">
+                                    <BookCheck className="h-4 w-4 text-forest/80 shrink-0" />
+                                    <span className="font-serif text-xs lg:text-xs text-forest/80 whitespace-nowrap">
                                         <strong className="font-bold">
                                             {totalPagesRead.toLocaleString()}
                                         </strong>{" "}
@@ -216,8 +216,8 @@ export function BookshelfExport({ allBooks }: Props) {
                                     style={{ display: "flex", alignItems: "center", gap: "6px" }}
                                     className="text-forest"
                                 >
-                                    <CirclePercent className="h-4 w-4 text-forest/50 shrink-0" />
-                                    <span className="font-serif text-xs sm:text-xs text-forest/50 whitespace-nowrap">
+                                    <CirclePercent className="h-4 w-4 text-forest/80 shrink-0" />
+                                    <span className="font-serif text-xs sm:text-xs text-forest/80 whitespace-nowrap">
                                         <strong className="font-bold">{libraryPercentage}%</strong>{" "}
                                         of library completed
                                     </span>

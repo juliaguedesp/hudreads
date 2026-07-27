@@ -20,7 +20,6 @@ export default async function BookshelfPage() {
 
     return (
         <>
-            <HeroBanner title="Bookshelf" />
 
             <section className="mx-auto max-w-6xl px-4 pt-5 pb-10 sm:px-6 sm:pt-5 sm:pb-14">
                 <Suspense fallback={<div className="text-center py-12 text-forest/50">Loading bookshelf...</div>}>

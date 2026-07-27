@@ -12,7 +12,6 @@ export default async function LibraryPage() {
 
     return (
         <div>
-            <HeroBanner title="Library" />
             <section className="mx-auto max-w-6xl w-full px-4 pt-6 sm:px-6 sm:pt-8 pb-[-100px]">
                 {books.length === 0 ? (
                     <p className="text-center text-forest/60">No books yet.</p>
