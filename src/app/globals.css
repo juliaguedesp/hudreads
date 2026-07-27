@@ -21,6 +21,7 @@
     --color-foreground: var(--foreground);
     --font-serif: var(--font-serif);
     --font-display: var(--font-display);
+    --spacing-5: 20px;
 }
 
 body {

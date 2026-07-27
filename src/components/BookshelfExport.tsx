@@ -19,6 +19,7 @@ export function BookshelfExport({ allBooks }: Props) {
 
     const exportRef = useRef<HTMLDivElement>(null);
 
+    // Read client storage safely post-hydration
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setReadSlugs(getReadBookSlugs() || []);
@@ -27,6 +28,7 @@ export function BookshelfExport({ allBooks }: Props) {
 
     const readBooks = allBooks.filter((b) => readSlugs.includes(b.slug));
 
+    // 📊 Stats Calculations
     const totalPagesRead = readBooks.reduce(
         (sum, book) => sum + (Number(book.pageCount) || 0),
         0
@@ -41,17 +43,11 @@ export function BookshelfExport({ allBooks }: Props) {
         if (!exportRef.current || isExporting) return;
         try {
             setIsExporting(true);
-
-            await new Promise((resolve) => setTimeout(resolve, 150));
-
             const canvas = await html2canvas(exportRef.current, {
-                backgroundColor: "#1A2E26",
+                backgroundColor: "#1A2E26", // Rich Forest Green
                 scale: 2,
                 useCORS: true,
-                allowTaint: true,
-                logging: true,
             });
-
             const link = document.createElement("a");
             link.download = "my-hudreads-bookshelf.png";
             link.href = canvas.toDataURL("image/png");
@@ -63,6 +59,7 @@ export function BookshelfExport({ allBooks }: Props) {
         }
     }
 
+    // Wait for client mount to avoid hydration mismatch
     if (!hasMounted) {
         return null;
     }
@@ -78,8 +75,7 @@ export function BookshelfExport({ allBooks }: Props) {
                     Mark books as &ldquo;Read&rdquo; on any book page and they&apos;ll appear
                     here. Your list is saved to this device.
                 </p>
-                {/* Removed border-b border-forest/10 */}
-                <div className="py-3 mb-8 flex flex-col items-center w-full">
+                <div className="pt-2 pb-5 border-b border-forest/10 flex flex-col items-center w-full">
                     <table
                         style={{
                             display: "table",
@@ -161,6 +157,7 @@ export function BookshelfExport({ allBooks }: Props) {
         );
     }
 
+    // Split books into rows of 4 books per shelf compartment
     const shelves: Book[][] = [];
     for (let i = 0; i < readBooks.length; i += 4) {
         shelves.push(readBooks.slice(i, i + 4));
@@ -168,8 +165,8 @@ export function BookshelfExport({ allBooks }: Props) {
 
     return (
         <div>
-            {/* 📈 Removed border-b border-forest/10 to eliminate the divider line */}
-            <div className="py-3 mb-8 flex flex-col items-center w-full">
+            {/* 📈 Summary Block */}
+            <div className="pt-2 pb-5 border-b border-forest/10 flex flex-col items-center w-full">
                 <table
                     style={{
                         display: "table",
@@ -180,6 +177,7 @@ export function BookshelfExport({ allBooks }: Props) {
                 >
                     <tbody>
                         <tr style={{ display: "table-row" }}>
+                            {/* Pages Read Cell */}
                             <td
                                 style={{
                                     display: "table-cell",
@@ -201,6 +199,7 @@ export function BookshelfExport({ allBooks }: Props) {
                                 </div>
                             </td>
 
+                            {/* Separator Dot Cell */}
                             <td
                                 style={{
                                     display: "table-cell",
@@ -211,6 +210,7 @@ export function BookshelfExport({ allBooks }: Props) {
                                 <span className="text-forest/30 text-xs select-none">•</span>
                             </td>
 
+                            {/* Completed Library Cell */}
                             <td style={{ display: "table-cell", verticalAlign: "middle" }}>
                                 <div
                                     style={{ display: "flex", alignItems: "center", gap: "6px" }}
@@ -228,8 +228,8 @@ export function BookshelfExport({ allBooks }: Props) {
                 </table>
             </div>
 
-            {/* Display Shelf Grid on Website */}
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+            {/* Display Shelf Grid on Website - Added pt-8 here to force gap below the line */}
+            <div className="pt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                 {readBooks.map((book) => (
                     <BookCard key={book.id} book={book} />
                 ))}
@@ -254,7 +254,7 @@ export function BookshelfExport({ allBooks }: Props) {
                 </Button>
             </div>
 
-            {/* HIDDEN PURE CSS WOODEN SHELF EXPORT CONTAINER */}
+            {/* 🎨 HIDDEN PURE CSS WOODEN SHELF EXPORT CONTAINER */}
             <div className="pointer-events-none fixed -left-[9999px] top-0">
                 <div
                     ref={exportRef}
@@ -262,7 +262,7 @@ export function BookshelfExport({ allBooks }: Props) {
                         width: "560px",
                         backgroundColor: "#1A2E26",
                         color: "#F5F0E8",
-                        padding: "32px 40px 32px 40px",
+                        padding: "50px 40px 35px 40px",
                         fontFamily: "serif",
                         display: "flex",
                         flexDirection: "column",
@@ -270,23 +270,24 @@ export function BookshelfExport({ allBooks }: Props) {
                         boxSizing: "border-box",
                     }}
                 >
-                    <div style={{ textAlign: "center", marginBottom: "20px" }}>
+                    {/* Header with Logo */}
+                    <div style={{ textAlign: "center", marginBottom: "35px" }}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                             src="/logo.png"
                             alt="Logo"
                             style={{
-                                height: "30px",
+                                height: "36px",
                                 width: "auto",
                                 display: "block",
-                                margin: "0 auto 8px auto",
+                                margin: "0 auto 10px auto",
                                 objectFit: "contain",
                             }}
                             crossOrigin="anonymous"
                         />
                         <h2
                             style={{
-                                fontSize: "16px",
+                                fontSize: "18px",
                                 fontWeight: "700",
                                 letterSpacing: "0.15em",
                                 color: "#c4a882",
@@ -298,31 +299,34 @@ export function BookshelfExport({ allBooks }: Props) {
                         </h2>
                     </div>
 
+                    {/* Book Cabinet Frame */}
                     <div
                         style={{
                             width: "100%",
                             backgroundColor: "#12201A",
                             borderRadius: "8px 8px 4px 4px",
-                            padding: "20px 20px 0px 20px",
+                            padding: "24px 20px 0px 20px",
                             boxShadow: "0 12px 28px rgba(0,0,0,0.4)",
                             boxSizing: "border-box",
                         }}
                     >
+                        {/* Shelf Rows (4 books per shelf) */}
                         {shelves.map((shelfBooks, shelfIndex) => (
                             <div
                                 key={shelfIndex}
                                 style={{
-                                    marginBottom: "16px",
+                                    marginBottom: "18px",
                                     position: "relative",
                                 }}
                             >
+                                {/* Books Row */}
                                 <div
                                     style={{
                                         display: "flex",
                                         alignItems: "flex-end",
                                         gap: "18px",
                                         padding: "0 10px",
-                                        height: "135px",
+                                        height: "140px",
                                         justifyContent: "center",
                                     }}
                                 >
@@ -357,6 +361,7 @@ export function BookshelfExport({ allBooks }: Props) {
                                     ))}
                                 </div>
 
+                                {/* 🪵 Pure CSS Wooden Shelf Plank */}
                                 <div
                                     style={{
                                         width: "100%",
@@ -374,9 +379,10 @@ export function BookshelfExport({ allBooks }: Props) {
                         ))}
                     </div>
 
+                    {/* Footer Stats Bar */}
                     <div
                         style={{
-                            marginTop: "24px",
+                            marginTop: "35px",
                             display: "flex",
                             alignItems: "center",
                             gap: "14px",
@@ -426,5 +432,3 @@ function BookshelfIcon() {
         </svg>
     );
 }
-
-export default BookshelfExport;
