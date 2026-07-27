@@ -72,7 +72,7 @@ export default async function BookOfMonthPage() {
                 title="Book of the Month"
             />
             {/* 🛠️ Matches HeroBanner container padding and max width */}
-            <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
+            <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
                 <div className="flex flex-col sm:flex-row items-start justify-center gap-8 sm:gap-12 max-w-4xl mx-auto">
                     {/* Fixed 250px cover size */}
                     <div className="shrink-0 overflow-hidden border border-forest/10 bg-beige-dark shadow-lg rounded-sm mx-auto sm:mx-0">
