@@ -23,7 +23,7 @@ const slides = [
         href: "/bookshelf",
         eyebrow: "Track Your Reading",
         title: "Your Bookshelf",
-        description: "Mark books as read and download a beautiful image of your personal Hudson-inspired bookshelf.",
+        description: "Mark books as read and download a beautiful image of your personal Hudreads bookshelf.",
         cta: "View bookshelf",
         bgClass: "bg-forest",
         textClass: "text-cream",

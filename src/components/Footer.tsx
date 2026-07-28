@@ -31,7 +31,7 @@ export function Footer() {
                         HUDREADS
                     </button>
                     <p className="font-serif mx-auto max-w-xl text-xs leading-relaxed text-forest/60">
-                        A fan-made reading community for Hudson Williams fans. Not
+                        A fan-made reading tracker for Hudson Williams fans. Not
                         affiliated with Hudson or his team.
                     </p>
                 </div>
