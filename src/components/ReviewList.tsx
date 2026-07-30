@@ -57,37 +57,63 @@ function ReviewItem({
 
     async function handleUpdate() {
         setLoading(true);
-        const res = await fetch(`/api/reviews/${review.id}`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                editToken: getReviewToken(review.id),
-                name,
-                twitter,
-                readingFormat: readingFormat || null,
-                rating,
-                reviewText: reviewText || null,
-            }),
-        });
-        setLoading(false);
-        if (res.ok) {
-            setEditing(false);
-            onChanged();
+        try {
+            const res = await fetch(`/api/reviews/${review.id}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    editToken: getReviewToken(review.id),
+                    name,
+                    twitter,
+                    readingFormat: readingFormat || null,
+                    rating,
+                    reviewText: reviewText || null,
+                }),
+            });
+
+            if (res.ok) {
+                setEditing(false);
+                onChanged();
+            } else {
+                const data = await res.json().catch(() => ({}));
+                alert(data.error || "Failed to update review.");
+            }
+        } catch (err) {
+            console.error("Update request error:", err);
+            alert("An error occurred while updating the review.");
+        } finally {
+            setLoading(false);
         }
     }
 
     async function handleDelete() {
         if (!confirm("Delete this review?")) return;
         setLoading(true);
-        const res = await fetch(`/api/reviews/${review.id}`, {
-            method: "DELETE",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ editToken: getReviewToken(review.id) }),
-        });
-        setLoading(false);
-        if (res.ok) {
-            removeReviewToken(review.id);
-            onChanged();
+
+        try {
+            const editToken = getReviewToken(review.id);
+
+            const res = await fetch(`/api/reviews/${review.id}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(editToken ? { "x-edit-token": editToken } : {}),
+                },
+                body: JSON.stringify({ editToken }),
+            });
+
+            if (res.ok) {
+                removeReviewToken(review.id);
+                onChanged();
+            } else {
+                const data = await res.json().catch(() => ({}));
+                alert(data.error || "Failed to delete review.");
+            }
+        } catch (err) {
+            console.error("Delete request error:", err);
+            alert("An error occurred while deleting the review.");
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -133,7 +159,7 @@ function ReviewItem({
                         type="button"
                         onClick={handleUpdate}
                         disabled={loading}
-                        className="inline-flex items-center gap-1 bg-forest px-3 py-1.5 text-sm text-cream rounded-lg font-medium hover:opacity-90"
+                        className="inline-flex items-center gap-1 bg-forest px-3 py-1.5 text-sm text-cream rounded-lg font-medium hover:opacity-90 disabled:opacity-50"
                     >
                         <Check size={14} /> Save
                     </button>
@@ -179,7 +205,7 @@ function ReviewItem({
                             type="button"
                             onClick={handleDelete}
                             disabled={loading}
-                            className="text-forest/50 transition-colors hover:text-red-700"
+                            className="text-forest/50 transition-colors hover:text-red-700 disabled:opacity-50"
                             aria-label="Delete review"
                         >
                             <Trash2 size={16} />
@@ -197,7 +223,6 @@ function ReviewItem({
                 )}
             </div>
 
-            {/* 🛠️ FIX APPLIED: Injected hard inline text layout rules that completely bypass engine cache configs */}
             {review.reviewText && (
                 <div
                     className="review-rendered-content prose mt-4 text-sm text-forest/80 font-serif max-w-full"

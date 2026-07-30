@@ -4,6 +4,9 @@ import { books, reviews } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
+// -------------------------------------------------------------
+// PATCH: Update Review
+// -------------------------------------------------------------
 export async function PATCH(
     req: NextRequest,
     { params }: { params: Promise<{ id: string }> }
@@ -12,6 +15,26 @@ export async function PATCH(
         const { id } = await params;
         const body = await req.json();
         const { name, twitter, readingFormat, rating, reviewText, editToken } = body;
+
+        // Fetch existing review to verify authorization
+        const [existingReview] = await db
+            .select()
+            .from(reviews)
+            .where(eq(reviews.id, id));
+
+        if (!existingReview) {
+            return NextResponse.json({ error: "Review not found" }, { status: 404 });
+        }
+
+        const isAdmin = req.cookies.get("admin_session")?.value === "true"; // Adjust cookie name if using admin auth
+        const hasValidToken = editToken && existingReview.editToken === editToken;
+
+        if (!isAdmin && !hasValidToken) {
+            return NextResponse.json(
+                { error: "Unauthorized: Invalid edit token" },
+                { status: 401 }
+            );
+        }
 
         const cleanReviewText = reviewText ? reviewText.replace(/&nbsp;/g, " ") : null;
 
@@ -23,7 +46,7 @@ export async function PATCH(
                 readingFormat,
                 rating: typeof rating === "number" ? rating.toFixed(1) : rating,
                 reviewText: cleanReviewText,
-                editToken: editToken,
+                editToken: editToken ?? existingReview.editToken,
             })
             .where(eq(reviews.id, id))
             .returning();
@@ -39,9 +62,76 @@ export async function PATCH(
             }
         }
 
+        return NextResponse.json({ success: true, data: updatedReview });
+    } catch (error) {
+        console.error("Update review error:", error);
+        return NextResponse.json({ error: "Failed to update review" }, { status: 500 });
+    }
+}
+
+// -------------------------------------------------------------
+// DELETE: Delete Review
+// -------------------------------------------------------------
+export async function DELETE(
+    req: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+) {
+    try {
+        const { id } = await params;
+
+        // Extract editToken from header or body safely
+        let editToken: string | null = req.headers.get("x-edit-token");
+
+        if (!editToken) {
+            try {
+                const body = await req.json();
+                editToken = body?.editToken ?? null;
+            } catch {
+                // Body might be empty
+            }
+        }
+
+        // Fetch review first to verify token or admin status
+        const [existingReview] = await db
+            .select()
+            .from(reviews)
+            .where(eq(reviews.id, id));
+
+        if (!existingReview) {
+            return NextResponse.json({ error: "Review not found" }, { status: 404 });
+        }
+
+        const isAdmin = req.cookies.get("admin_session")?.value === "true"; // Adjust based on your admin session logic
+        const hasValidToken = editToken && existingReview.editToken === editToken;
+
+        if (!isAdmin && !hasValidToken) {
+            return NextResponse.json(
+                { error: "Unauthorized: Invalid edit token" },
+                { status: 401 }
+            );
+        }
+
+        // Delete from database
+        const [deletedReview] = await db
+            .delete(reviews)
+            .where(eq(reviews.id, id))
+            .returning();
+
+        // Revalidate Next.js cache so the book page instantly updates
+        if (deletedReview?.bookId) {
+            const [book] = await db
+                .select({ slug: books.slug })
+                .from(books)
+                .where(eq(books.id, deletedReview.bookId));
+
+            if (book?.slug) {
+                revalidatePath(`/books/${book.slug}`);
+            }
+        }
+
         return NextResponse.json({ success: true });
     } catch (error) {
-        console.error(error);
-        return NextResponse.json({ error: "Failed to update" }, { status: 500 });
+        console.error("Delete review error:", error);
+        return NextResponse.json({ error: "Failed to delete review" }, { status: 500 });
     }
 }
