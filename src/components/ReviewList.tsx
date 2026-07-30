@@ -260,11 +260,11 @@ function ReviewItem({
 
                     {/* Toggle Button */}
                     {isClamped && (
-                        <div className="relative z-10 pt-2 bg-white">
+                        <div className="relative z-10 pt-1 bg-white">
                             <button
                                 type="button"
                                 onClick={() => setIsExpanded(!isExpanded)}
-                                className="inline-flex items-center gap-1 text-xs font-semibold text-forest hover:opacity-80 focus:outline-none transition-opacity"
+                                className="inline-flex items-center gap-1 text-xs font-semibold text-forest/80 hover:opacity-50 focus:outline-none transition-opacity"
                             >
                                 {isExpanded ? (
                                     <>
