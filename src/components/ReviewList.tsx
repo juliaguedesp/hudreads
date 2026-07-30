@@ -13,6 +13,18 @@ type Props = {
     onChanged: () => void;
 };
 
+function formatDate(dateInput?: Date | string | null) {
+    if (!dateInput) return "";
+    const date = new Date(dateInput);
+    if (isNaN(date.getTime())) return "";
+
+    return new Intl.DateTimeFormat("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+    }).format(date);
+}
+
 export function ReviewList({ reviews, isAdmin, onChanged }: Props) {
     if (reviews.length === 0) {
         return (
@@ -59,6 +71,7 @@ function ReviewItem({
     const contentRef = useRef<HTMLDivElement>(null);
 
     const canEdit = isAdmin || !!getReviewToken(review.id);
+    const formattedDate = formatDate(review.createdAt);
 
     // Detect if content height exceeds ~10 lines (~260px)
     useEffect(() => {
@@ -240,6 +253,17 @@ function ReviewItem({
                         {READING_FORMAT_LABELS[review.readingFormat as keyof typeof READING_FORMAT_LABELS] ?? review.readingFormat}
                     </span>
                 )}
+                {formattedDate && (
+                    <>
+                        <span className="text-forest/20 text-xs">•</span>
+                        <time
+                            dateTime={review.createdAt ? new Date(review.createdAt).toISOString() : undefined}
+                            className="text-xs text-forest/50 font-medium"
+                        >
+                            {formattedDate}
+                        </time>
+                    </>
+                )}
             </div>
 
             {review.reviewText && (
@@ -264,7 +288,7 @@ function ReviewItem({
                             <button
                                 type="button"
                                 onClick={() => setIsExpanded(!isExpanded)}
-                                className="inline-flex items-center text-xs font-semibold text-forest/80 hover:opacity-50 focus:outline-none transition-opacity"
+                                className="inline-flex items-center gap-1 text-xs font-semibold text-forest/80 hover:opacity-50 focus:outline-none transition-opacity"
                             >
                                 {isExpanded ? (
                                     <>
