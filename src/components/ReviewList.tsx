@@ -255,7 +255,7 @@ function ReviewItem({
 
                     {/* Gradient Fade Overlay */}
                     {isClamped && !isExpanded && (
-                        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
+                        <div className="absolute bottom-0 left-0 right-0 h-15 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
                     )}
 
                     {/* Toggle Button */}
@@ -268,7 +268,7 @@ function ReviewItem({
                             >
                                 {isExpanded ? (
                                     <>
-                                        Show less <ArrowLeft size={14} />
+                                        <ArrowLeft size={14} /> Show less
                                     </>
                                 ) : (
                                     <>
