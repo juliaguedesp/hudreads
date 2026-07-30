@@ -147,7 +147,7 @@ export default async function BookPage({ params }: Props) {
                             {book.hudsonReference && (
                                 <div className="rounded-xl border border-forest/10 bg-white p-6 shadow-sm">
                                     <div className="flex items-center gap-2 text-forest">
-                                        <Sparkles size={18} className="text-tan" />
+                                        <Sparkles size={18} className="shrink-0 text-tan" />
                                         <h2 className="font-display text-forest text-lg font-bold">
                                             Hudson & {book.title}
                                         </h2>

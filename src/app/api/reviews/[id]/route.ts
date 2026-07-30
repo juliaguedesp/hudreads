@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
-import { reviews } from "@/db/schema";
+import { books, reviews } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 
 export async function PATCH(
     req: NextRequest,
@@ -14,17 +15,29 @@ export async function PATCH(
 
         const cleanReviewText = reviewText ? reviewText.replace(/&nbsp;/g, " ") : null;
 
-        await db
+        const [updatedReview] = await db
             .update(reviews)
             .set({
                 name,
                 twitter,
                 readingFormat,
-                rating,
+                rating: typeof rating === "number" ? rating.toFixed(1) : rating,
                 reviewText: cleanReviewText,
                 editToken: editToken,
             })
-            .where(eq(reviews.id, id));
+            .where(eq(reviews.id, id))
+            .returning();
+
+        if (updatedReview?.bookId) {
+            const [book] = await db
+                .select({ slug: books.slug })
+                .from(books)
+                .where(eq(books.id, updatedReview.bookId));
+
+            if (book?.slug) {
+                revalidatePath(`/books/${book.slug}`);
+            }
+        }
 
         return NextResponse.json({ success: true });
     } catch (error) {

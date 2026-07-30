@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { useRouter } from "next/navigation";
 import { ReviewForm } from "./ReviewForm";
 import { ReviewList } from "./ReviewList";
 import type { Review } from "@/db/schema";
@@ -12,12 +13,10 @@ type Props = {
 };
 
 export function BookReviews({ bookId, initialReviews, isAdmin }: Props) {
-    // Use a key-syncing strategy or standard tracking state to prevent unneeded effect hooks
+    const router = useRouter();
     const [reviews, setReviews] = useState(initialReviews);
     const [prevInitialReviews, setPrevInitialReviews] = useState(initialReviews);
 
-    // Synchronize state directly during render loop if the parent props change 
-    // This is the officially recommended React pattern instead of useEffect
     if (initialReviews !== prevInitialReviews) {
         setReviews(initialReviews);
         setPrevInitialReviews(initialReviews);
@@ -28,14 +27,11 @@ export function BookReviews({ bookId, initialReviews, isAdmin }: Props) {
         if (res.ok) {
             setReviews(await res.json());
         }
-    }, [bookId]);
+        // Triggers Next.js router refresh so server-rendered sections update instantly
+        router.refresh();
+    }, [bookId, router]);
 
     return (
-        /* 🛠️ FORCE SIDE-BY-SIDE VIA INLINE CSS RULES:
-          If Tailwind classes are cached or stuck in Turbopack memory, 
-          these standard inline elements will take absolute priority 
-          over the layout renderer without requiring any terminal deletion.
-        */
         <div
             className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start w-full max-w-full overflow-hidden"
             style={{
@@ -45,13 +41,8 @@ export function BookReviews({ bookId, initialReviews, isAdmin }: Props) {
                 maxWidth: "100%"
             }}
         >
-
             {/* Left Column Component Layout Area: The Submission Box */}
             <div className="w-full min-w-0 h-fit" style={{ width: "100%", minWidth: 0, height: "fit-content" }}>
-                {/* 🌟 Tiny Change: Added an invisible timestamp spacer keyword attribute.
-                    Changing any basic HTML string attribute inside your file forces 
-                    Next.js to immediately discard the layout file memory cache 
-                    and perform an instant code hot-reload on your screen. */}
                 <div data-refresh-token="force-layout-update-v1">
                     <ReviewForm bookId={bookId} onSubmitted={refresh} />
                 </div>
@@ -64,7 +55,6 @@ export function BookReviews({ bookId, initialReviews, isAdmin }: Props) {
                 </h3>
                 <ReviewList reviews={reviews} isAdmin={isAdmin} onChanged={refresh} />
             </div>
-
         </div>
     );
 }

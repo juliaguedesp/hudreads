@@ -1,9 +1,11 @@
 import { db } from "@/db";
-import { reviews } from "@/db/schema";
+import { books, reviews } from "@/db/schema";
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { reviewRatelimit } from "@/lib/ratelimit";
 import { reviewSchema } from "@/lib/schemas/review";
+import { revalidatePath } from "next/cache";
+import { eq } from "drizzle-orm";
 
 export async function POST(req: Request) {
     try {
@@ -67,11 +69,21 @@ export async function POST(req: Request) {
                 name,
                 twitter,
                 readingFormat: readingFormat || null,
-                rating: rating.toFixed(1), // 👈 Converts number (4.5) to string ("4.5") for Drizzle numeric column
+                rating: rating.toFixed(1),
                 reviewText: cleanReviewText,
                 editToken: generatedToken,
             })
             .returning();
+
+        // 7. Clear Next.js cache for this book page
+        const [book] = await db
+            .select({ slug: books.slug })
+            .from(books)
+            .where(eq(books.id, bookId));
+
+        if (book?.slug) {
+            revalidatePath(`/books/${book.slug}`);
+        }
 
         return NextResponse.json(newReview);
     } catch (error) {
