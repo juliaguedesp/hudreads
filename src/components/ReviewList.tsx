@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Pencil, Trash2, X, Check } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Pencil, Trash2, X, Check, ChevronDown, ChevronUp } from "lucide-react";
 import { StarRating } from "./StarRating";
 import { getReviewToken, removeReviewToken } from "@/lib/utils";
 import { READING_FORMAT_LABELS } from "@/lib/validations";
@@ -53,7 +53,27 @@ function ReviewItem({
     const [reviewText, setReviewText] = useState(review.reviewText ?? "");
     const [loading, setLoading] = useState(false);
 
+    // Read More state & DOM measurement ref
+    const [isExpanded, setIsExpanded] = useState(false);
+    const [isClamped, setIsClamped] = useState(false);
+    const contentRef = useRef<HTMLDivElement>(null);
+
     const canEdit = isAdmin || !!getReviewToken(review.id);
+
+    // Detect if content height exceeds ~10 lines (~260px assuming 14px font & 1.625 line-height)
+    useEffect(() => {
+        if (!editing && contentRef.current) {
+            const clientHeight = contentRef.current.clientHeight;
+            const scrollHeight = contentRef.current.scrollHeight;
+
+            // 10 lines of standard paragraph text is approx 260px
+            if (scrollHeight > 260 || scrollHeight > clientHeight + 10) {
+                setIsClamped(true);
+            } else {
+                setIsClamped(false);
+            }
+        }
+    }, [review.reviewText, editing]);
 
     async function handleUpdate() {
         setLoading(true);
@@ -224,12 +244,40 @@ function ReviewItem({
             </div>
 
             {review.reviewText && (
-                <div
-                    className="review-rendered-content prose mt-4 text-sm text-forest/80 font-serif max-w-full"
-                    dangerouslySetInnerHTML={{
-                        __html: review.reviewText.replaceAll("&nbsp;", " ")
-                    }}
-                />
+                <div className="relative mt-4">
+                    <div
+                        ref={contentRef}
+                        className={`review-rendered-content prose text-sm text-forest/80 font-serif max-w-full transition-all duration-300 relative overflow-hidden ${isClamped && !isExpanded ? "max-h-[260px]" : "max-h-none"
+                            }`}
+                        dangerouslySetInnerHTML={{
+                            __html: review.reviewText.replaceAll("&nbsp;", " "),
+                        }}
+                    />
+
+                    {/* Gradient overlay when collapsed */}
+                    {isClamped && !isExpanded && (
+                        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+                    )}
+
+                    {/* Toggle Button */}
+                    {isClamped && (
+                        <button
+                            type="button"
+                            onClick={() => setIsExpanded(!isExpanded)}
+                            className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-forest hover:underline focus:outline-none"
+                        >
+                            {isExpanded ? (
+                                <>
+                                    Show less <ChevronUp size={14} />
+                                </>
+                            ) : (
+                                <>
+                                    Read more <ChevronDown size={14} />
+                                </>
+                            )}
+                        </button>
+                    )}
+                </div>
             )}
 
             {/* Scoped Global Overrides */}
