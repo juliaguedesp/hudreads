@@ -2,9 +2,23 @@ import { db } from "@/db";
 import { reviews } from "@/db/schema";
 import { NextResponse } from "next/server";
 import crypto from "crypto";
+import { reviewRatelimit } from "@/lib/ratelimit";
 
 export async function POST(req: Request) {
     try {
+        // 1. Get Client IP Address (Vercel provides this in the header)
+        const ip = req.headers.get("x-forwarded-for")?.split(",")[0] ?? "127.0.0.1";
+
+        // 2. Check Rate Limit
+        const { success } = await reviewRatelimit.limit(ip);
+
+        if (!success) {
+            return NextResponse.json(
+                { error: "Too many review submissions. Please wait an hour before posting again." },
+                { status: 429 }
+            );
+        }
+
         const body = await req.json();
         const { bookId, name, twitter, readingFormat, rating, reviewText, turnstileToken } = body;
 
@@ -37,13 +51,13 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Turnstile verification failed. Please try again." }, { status: 400 });
         }
 
-        // Limpa os espaços rígidos do HTML
+        // Clean HTML non-breaking spaces
         const cleanReviewText = reviewText ? reviewText.replace(/&nbsp;/g, " ") : null;
 
-        // Gerar um token único obrigatório para essa review
+        // Generate unique token
         const generatedToken = crypto.randomUUID();
 
-        // Passa o token gerado para satisfazer o esquema do Drizzle
+        // Insert into database
         const [newReview] = await db
             .insert(reviews)
             .values({
@@ -59,7 +73,7 @@ export async function POST(req: Request) {
 
         return NextResponse.json(newReview);
     } catch (error) {
-        console.error(error);
+        console.error("Review submission error:", error);
         return NextResponse.json({ error: "Failed to submit review." }, { status: 500 });
     }
 }
