@@ -60,13 +60,12 @@ function ReviewItem({
 
     const canEdit = isAdmin || !!getReviewToken(review.id);
 
-    // Detect if content height exceeds ~10 lines (~260px assuming 14px font & 1.625 line-height)
+    // Detect if content height exceeds ~10 lines (~260px)
     useEffect(() => {
         if (!editing && contentRef.current) {
             const clientHeight = contentRef.current.clientHeight;
             const scrollHeight = contentRef.current.scrollHeight;
 
-            // 10 lines of standard paragraph text is approx 260px
             if (scrollHeight > 260 || scrollHeight > clientHeight + 10) {
                 setIsClamped(true);
             } else {
@@ -254,28 +253,30 @@ function ReviewItem({
                         }}
                     />
 
-                    {/* Gradient overlay when collapsed */}
+                    {/* Gradient Fade Overlay */}
                     {isClamped && !isExpanded && (
-                        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+                        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
                     )}
 
                     {/* Toggle Button */}
                     {isClamped && (
-                        <button
-                            type="button"
-                            onClick={() => setIsExpanded(!isExpanded)}
-                            className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-forest hover:underline focus:outline-none"
-                        >
-                            {isExpanded ? (
-                                <>
-                                    Show less <ChevronUp size={14} />
-                                </>
-                            ) : (
-                                <>
-                                    Read more <ChevronDown size={14} />
-                                </>
-                            )}
-                        </button>
+                        <div className="relative z-10 pt-2 bg-white">
+                            <button
+                                type="button"
+                                onClick={() => setIsExpanded(!isExpanded)}
+                                className="inline-flex items-center gap-1 text-xs font-semibold text-forest hover:opacity-80 focus:outline-none transition-opacity"
+                            >
+                                {isExpanded ? (
+                                    <>
+                                        Show less <ChevronUp size={14} />
+                                    </>
+                                ) : (
+                                    <>
+                                        Read more <ChevronDown size={14} />
+                                    </>
+                                )}
+                            </button>
+                        </div>
                     )}
                 </div>
             )}
