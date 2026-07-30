@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import dynamic from "next/dynamic";
+import { Turnstile } from "@marsidev/react-turnstile";
 import { StarRating } from "./StarRating";
 import { Button } from "./Button";
 import { saveReviewToken } from "@/lib/utils";
@@ -26,6 +27,7 @@ export function ReviewForm({ bookId, onSubmitted }: Props) {
     const [readingFormat, setReadingFormat] = useState("");
     const [rating, setRating] = useState(0);
     const [reviewText, setReviewText] = useState("");
+    const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
@@ -55,6 +57,11 @@ export function ReviewForm({ bookId, onSubmitted }: Props) {
             return;
         }
 
+        if (!turnstileToken) {
+            setError("Please complete the bot security check.");
+            return;
+        }
+
         const finalReviewText = (reviewText === "<p><br></p>" || !reviewText) ? null : reviewText;
 
         setLoading(true);
@@ -68,6 +75,7 @@ export function ReviewForm({ bookId, onSubmitted }: Props) {
                 readingFormat: readingFormat || null,
                 rating,
                 reviewText: finalReviewText,
+                turnstileToken, // 🛡️ Send Turnstile token to backend API
             }),
         });
 
@@ -84,11 +92,13 @@ export function ReviewForm({ bookId, onSubmitted }: Props) {
             saveReviewToken(data.id, data.editToken);
         }
 
+        // Reset form inputs & token state
         setName("");
         setTwitter("");
         setReadingFormat("");
         setRating(0);
         setReviewText("");
+        setTurnstileToken(null);
         onSubmitted();
     }
 
@@ -283,10 +293,19 @@ export function ReviewForm({ bookId, onSubmitted }: Props) {
                 `}</style>
             </div>
 
+            {/* 🛡️ Cloudflare Turnstile Widget */}
+            <div className="pt-1">
+                <Turnstile
+                    siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+                    onSuccess={(tok) => setTurnstileToken(tok)}
+                    onExpire={() => setTurnstileToken(null)}
+                />
+            </div>
+
             {error && <p className="text-sm text-red-700">{error}</p>}
 
             <div className="pt-2">
-                <Button type="submit" disabled={loading}>
+                <Button type="submit" disabled={loading || !turnstileToken}>
                     {loading ? "Posting..." : "Post"}
                 </Button>
             </div>
