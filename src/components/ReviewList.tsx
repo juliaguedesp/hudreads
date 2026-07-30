@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Pencil, Trash2, X, Check, ChevronDown, ChevronUp } from "lucide-react";
+import { Pencil, Trash2, X, Check, ArrowRight, ArrowLeft } from "lucide-react";
 import { StarRating } from "./StarRating";
 import { getReviewToken, removeReviewToken } from "@/lib/utils";
 import { READING_FORMAT_LABELS } from "@/lib/validations";
@@ -264,15 +264,15 @@ function ReviewItem({
                             <button
                                 type="button"
                                 onClick={() => setIsExpanded(!isExpanded)}
-                                className="inline-flex items-center gap-1 text-xs font-semibold text-forest/80 hover:opacity-50 focus:outline-none transition-opacity"
+                                className="inline-flex items-center text-xs font-semibold text-forest/80 hover:opacity-50 focus:outline-none transition-opacity"
                             >
                                 {isExpanded ? (
                                     <>
-                                        Show less <ChevronUp size={14} />
+                                        Show less <ArrowLeft size={14} />
                                     </>
                                 ) : (
                                     <>
-                                        Read more <ChevronDown size={14} />
+                                        Read more <ArrowRight size={14} />
                                     </>
                                 )}
                             </button>
