@@ -70,7 +70,8 @@ function ReviewItem({
     const [isClamped, setIsClamped] = useState(false);
     const contentRef = useRef<HTMLDivElement>(null);
 
-    const canEdit = isAdmin || !!getReviewToken(review.id);
+    const storedToken = getReviewToken(review.id);
+    const canEdit = isAdmin || !!storedToken;
     const formattedDate = formatDate(review.createdAt);
 
     // Detect if content height exceeds ~10 lines (~260px)
@@ -90,11 +91,16 @@ function ReviewItem({
     async function handleUpdate() {
         setLoading(true);
         try {
+            const editToken = getReviewToken(review.id);
+
             const res = await fetch(`/api/reviews/${review.id}`, {
                 method: "PATCH",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(editToken ? { "x-edit-token": editToken } : {}),
+                },
                 body: JSON.stringify({
-                    editToken: getReviewToken(review.id),
+                    ...(editToken ? { editToken } : {}),
                     name,
                     twitter,
                     readingFormat: readingFormat || null,
@@ -131,7 +137,9 @@ function ReviewItem({
                     "Content-Type": "application/json",
                     ...(editToken ? { "x-edit-token": editToken } : {}),
                 },
-                body: JSON.stringify({ editToken }),
+                body: JSON.stringify({
+                    ...(editToken ? { editToken } : {}),
+                }),
             });
 
             if (res.ok) {

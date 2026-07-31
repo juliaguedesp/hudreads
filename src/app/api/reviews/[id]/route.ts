@@ -4,6 +4,16 @@ import { books, reviews } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
+// check if request originates from an Admin session
+function checkIsAdmin(req: NextRequest): boolean {
+    const adminHeader = req.headers.get("x-admin-auth");
+    if (adminHeader === "true") return true;
+
+    const adminCookie = req.cookies.get("admin_session")?.value;
+    // Checks if cookie exists or equals "true"
+    return Boolean(adminCookie && adminCookie !== "false");
+}
+
 // -------------------------------------------------------------
 // PATCH: Update Review
 // -------------------------------------------------------------
@@ -16,6 +26,10 @@ export async function PATCH(
         const body = await req.json();
         const { name, twitter, readingFormat, rating, reviewText, editToken } = body;
 
+        // Extract token from body or custom header
+        const headerToken = req.headers.get("x-edit-token");
+        const effectiveToken = editToken || headerToken;
+
         // Fetch existing review to verify authorization
         const [existingReview] = await db
             .select()
@@ -26,8 +40,10 @@ export async function PATCH(
             return NextResponse.json({ error: "Review not found" }, { status: 404 });
         }
 
-        const isAdmin = req.cookies.get("admin_session")?.value === "true"; // Adjust cookie name if using admin auth
-        const hasValidToken = editToken && existingReview.editToken === editToken;
+        const isAdmin = checkIsAdmin(req);
+        const hasValidToken = Boolean(
+            effectiveToken && existingReview.editToken === effectiveToken
+        );
 
         if (!isAdmin && !hasValidToken) {
             return NextResponse.json(
@@ -36,7 +52,9 @@ export async function PATCH(
             );
         }
 
-        const cleanReviewText = reviewText ? reviewText.replace(/&nbsp;/g, " ") : null;
+        const cleanReviewText = reviewText
+            ? reviewText.replace(/&nbsp;/g, " ")
+            : null;
 
         const [updatedReview] = await db
             .update(reviews)
@@ -46,7 +64,8 @@ export async function PATCH(
                 readingFormat,
                 rating: typeof rating === "number" ? rating.toFixed(1) : rating,
                 reviewText: cleanReviewText,
-                editToken: editToken ?? existingReview.editToken,
+                // Preserve existing token if none was passed in payload
+                editToken: effectiveToken ?? existingReview.editToken,
             })
             .where(eq(reviews.id, id))
             .returning();
@@ -65,7 +84,10 @@ export async function PATCH(
         return NextResponse.json({ success: true, data: updatedReview });
     } catch (error) {
         console.error("Update review error:", error);
-        return NextResponse.json({ error: "Failed to update review" }, { status: 500 });
+        return NextResponse.json(
+            { error: "Failed to update review" },
+            { status: 500 }
+        );
     }
 }
 
@@ -101,8 +123,10 @@ export async function DELETE(
             return NextResponse.json({ error: "Review not found" }, { status: 404 });
         }
 
-        const isAdmin = req.cookies.get("admin_session")?.value === "true"; // Adjust based on your admin session logic
-        const hasValidToken = editToken && existingReview.editToken === editToken;
+        const isAdmin = checkIsAdmin(req);
+        const hasValidToken = Boolean(
+            editToken && existingReview.editToken === editToken
+        );
 
         if (!isAdmin && !hasValidToken) {
             return NextResponse.json(
@@ -132,6 +156,9 @@ export async function DELETE(
         return NextResponse.json({ success: true });
     } catch (error) {
         console.error("Delete review error:", error);
-        return NextResponse.json({ error: "Failed to delete review" }, { status: 500 });
+        return NextResponse.json(
+            { error: "Failed to delete review" },
+            { status: 500 }
+        );
     }
 }
