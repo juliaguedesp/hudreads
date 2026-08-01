@@ -1,8 +1,9 @@
 import Image from "next/image";
-import { MessageCircleHeart, StarPlus } from "lucide-react";
+import { MessageCircleHeart, StarPlus, Calendar } from "lucide-react";
 import { HeroBanner } from "@/components/HeroBanner";
 import { Button } from "@/components/Button";
-import { getActiveBookOfMonth } from "@/lib/queries";
+import { PastPicks } from "@/components/PastPicks";
+import { getActiveBookOfMonth, getPastBooksOfMonth } from "@/lib/queries";
 import { formatMonthYear } from "@/lib/utils";
 
 export const metadata = {
@@ -12,18 +13,23 @@ export const metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function BookOfMonthPage() {
-    let pick = null;
+    let pick: Awaited<ReturnType<typeof getActiveBookOfMonth>> | null = null;
+    let pastPicks: Awaited<ReturnType<typeof getPastBooksOfMonth>> = [];
 
     try {
-        pick = await getActiveBookOfMonth();
-        console.log("📅 [BOM QUERY SUCCESS] Returned row payload:", pick);
+        const [activeResult, pastResult] = await Promise.all([
+            getActiveBookOfMonth(),
+            getPastBooksOfMonth(),
+        ]);
+
+        pick = activeResult;
+        pastPicks = pastResult || [];
     } catch (error) {
         console.error("❌ [BOM QUERY EXCEPTION] Database fetch crashed:", error);
         pick = null;
     }
 
     if (!pick) {
-        console.log("⚠️ [BOM EMPTY] Query returned null or undefined. Showing fallback screen.");
         return (
             <>
                 <HeroBanner eyebrow="Book club" title="Book of the Month" />
@@ -32,6 +38,7 @@ export default async function BookOfMonthPage() {
                         No book of the month selected yet. Check back soon!
                     </p>
                 </section>
+                {pastPicks.length > 0 && <PastPicks picks={pastPicks} />}
             </>
         );
     }
@@ -71,11 +78,10 @@ export default async function BookOfMonthPage() {
                 eyebrow={getSafeEyebrowDate()}
                 title="Book of the Month"
             />
-            {/* 🛠️ Matches HeroBanner container padding and max width */}
             <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
                 <div className="flex flex-col sm:flex-row items-start justify-center gap-8 sm:gap-12 max-w-4xl mx-auto">
                     {/* Fixed 250px cover size */}
-                    <div className="shrink-0 overflow-hidden border border-forest/10 bg-beige-dark shadow-lg rounded-sm mx-auto sm:mx-0">
+                    <div className="shrink-0 overflow-hidden border border-forest/10 bg-beige-dark shadow-lg mx-auto sm:mx-0">
                         {book.coverUrl && (
                             <Image
                                 src={book.coverUrl}
@@ -124,6 +130,17 @@ export default async function BookOfMonthPage() {
                             )}
                         </div>
 
+                        {/* Discussion Date Badge */}
+                        {bom.discussionDate && (
+                            <div className="mt-6 inline-flex items-center gap-2 rounded-xl border border-forest/15 bg-white/60 px-4 py-2 text-sm text-forest/80 shadow-xs">
+                                <Calendar size={16} className="shrink-0 text-tan" />
+                                <span>
+                                    <strong className="font-semibold text-forest/80">Discussion Date:</strong>{" "}
+                                    {bom.discussionDate}
+                                </span>
+                            </div>
+                        )}
+
                         {book.hudsonReference && (
                             <blockquote className="mt-6 border-l-4 border-tan pl-4 italic text-forest/80">
                                 {book.hudsonReference}
@@ -150,6 +167,9 @@ export default async function BookOfMonthPage() {
                     </div>
                 </div>
             </section>
+
+            {/* 📚 Past Picks Banner */}
+            {pastPicks.length > 0 && <PastPicks picks={pastPicks} />}
         </>
     );
 }

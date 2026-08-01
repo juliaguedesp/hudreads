@@ -45,7 +45,7 @@ export async function getReviewsForBook(bookId: string) {
         .orderBy(desc(reviews.createdAt));
 }
 
-// 🌟 Clean Drizzle query now running flawlessly over the "botm" table mapper
+// drizzle query running over the "botm" table mapper
 export async function getActiveBookOfMonth() {
     const [row] = await getDb()
         .select({
@@ -59,4 +59,19 @@ export async function getActiveBookOfMonth() {
         .limit(1);
 
     return row ?? null;
+}
+
+// fetches all previous month picks (where isActive is false), sorted newest to oldest
+export async function getPastBooksOfMonth() {
+    const rows = await getDb()
+        .select({
+            bookOfMonth: bookOfMonth,
+            book: books,
+        })
+        .from(bookOfMonth)
+        .innerJoin(books, eq(bookOfMonth.bookId, books.id))
+        .where(eq(bookOfMonth.isActive, false))
+        .orderBy(desc(bookOfMonth.year), desc(bookOfMonth.month));
+
+    return rows;
 }

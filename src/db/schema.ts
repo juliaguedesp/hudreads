@@ -10,7 +10,6 @@ import {
     varchar,
 } from "drizzle-orm/pg-core";
 
-
 export const books = pgTable("books", {
     id: uuid("id").defaultRandom().primaryKey(),
     slug: varchar("slug", { length: 255 }).notNull().unique(),
@@ -48,8 +47,9 @@ export const bookOfMonth = pgTable("botm", {
         .notNull(),
     month: integer("month_label").notNull(),
     year: integer("year").notNull(),
-    discordLink: text("club_url").notNull(),
-    isActive: boolean("is_active").default(true),
+    discussionDate: text("discussion_date"),
+    isActive: boolean("is_active").default(false).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
 
 export type Book = typeof books.$inferSelect;
