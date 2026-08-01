@@ -1,5 +1,4 @@
 import type { Book } from "@/db/schema";
-import { HeroBanner } from "@/components/HeroBanner";
 import { LibraryClient } from "@/components/LibraryClient";
 import { getAllBooks } from "@/lib/queries";
 

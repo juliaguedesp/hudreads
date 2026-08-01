@@ -14,8 +14,13 @@ export function MarkAsReadButton({ slug, className }: Props) {
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        setMounted(true);
-        setRead(isBookRead(slug));
+        // Defer state update to avoid calling setState synchronously in effect body
+        const frame = requestAnimationFrame(() => {
+            setMounted(true);
+            setRead(isBookRead(slug));
+        });
+
+        return () => cancelAnimationFrame(frame);
     }, [slug]);
 
     function handleClick() {
@@ -29,7 +34,7 @@ export function MarkAsReadButton({ slug, className }: Props) {
                 type="button"
                 disabled
                 className={cn(
-                    "inline-flex items-center gap-2 bg-forest/50 px-5 py-2.5 text-cream font-display",
+                    "inline-flex items-center gap-2 bg-forest/50 px-5 py-2.5 text-cream font-display opacity-70 cursor-not-allowed",
                     className,
                 )}
             >

@@ -1,12 +1,10 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Sparkles } from "lucide-react";
-import { HeroBanner } from "@/components/HeroBanner";
 import { MarkAsReadButton } from "@/components/MarkAsReadButton";
 import { BookReviews } from "@/components/BookReviews";
 import { isAdminAuthenticated } from "@/lib/admin";
 import { getBookBySlug, getReviewsForBook } from "@/lib/queries";
-import { averageRating } from "@/lib/utils";
 import type { Book, Review } from "@/db/schema";
 
 export const dynamic = "force-dynamic";
@@ -49,15 +47,6 @@ export default async function BookPage({ params }: Props) {
     if (!book) {
         notFound();
     }
-
-    const ratings = bookReviews.map((r) => parseFloat(r.rating));
-    const avg = averageRating(ratings);
-
-    const primaryEyebrow = Array.isArray(book.genre)
-        ? book.genre[0]
-        : book.genre
-            ? (book.genre as string).split(",")[0].trim()
-            : "Recommended read";
 
     // Split synopsis safely into discrete paragraphs to preserve structure
     const synopsisParagraphs = book.synopsis

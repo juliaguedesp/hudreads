@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import { HeroBanner } from "@/components/HeroBanner";
 import { BookshelfExport } from "@/components/BookshelfExport";
 import { getAllBooks } from "@/lib/queries";
 import type { Book } from "@/db/schema";
