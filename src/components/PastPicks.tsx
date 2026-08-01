@@ -3,77 +3,46 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Calendar } from "lucide-react";
+import type { Book, BookOfMonth } from "@/db/schema";
 
 interface PastPick {
-    bookOfMonth: {
-        month?: number | string | null;
-        monthLabel?: number | string | null;
-        year?: number | string | null;
-    };
-    book: {
-        title: string;
-        author: string;
-        coverUrl?: string | null;
-        slug: string;
-    };
+    bookOfMonth: BookOfMonth;
+    book: Book;
 }
 
-const MONTH_MAP: Record<string, { name: string; num: number }> = {
-    "1": { name: "January", num: 1 }, "01": { name: "January", num: 1 }, "jan": { name: "January", num: 1 }, "january": { name: "January", num: 1 },
-    "2": { name: "February", num: 2 }, "02": { name: "February", num: 2 }, "feb": { name: "February", num: 2 }, "february": { name: "February", num: 2 },
-    "3": { name: "March", num: 3 }, "03": { name: "March", num: 3 }, "mar": { name: "March", num: 3 }, "march": { name: "March", num: 3 },
-    "4": { name: "April", num: 4 }, "04": { name: "April", num: 4 }, "apr": { name: "April", num: 4 }, "april": { name: "April", num: 4 },
-    "5": { name: "May", num: 5 }, "05": { name: "May", num: 5 }, "may": { name: "May", num: 5 },
-    "6": { name: "June", num: 6 }, "06": { name: "June", num: 6 }, "jun": { name: "June", num: 6 }, "june": { name: "June", num: 6 },
-    "7": { name: "July", num: 7 }, "07": { name: "July", num: 7 }, "jul": { name: "July", num: 7 }, "july": { name: "July", num: 7 },
-    "8": { name: "August", num: 8 }, "08": { name: "August", num: 8 }, "aug": { name: "August", num: 8 }, "august": { name: "August", num: 8 },
-    "9": { name: "September", num: 9 }, "09": { name: "September", num: 9 }, "sep": { name: "September", num: 9 }, "september": { name: "September", num: 9 },
-    "10": { name: "October", num: 10 }, "oct": { name: "October", num: 10 }, "october": { name: "October", num: 10 },
-    "11": { name: "November", num: 11 }, "nov": { name: "November", num: 11 }, "november": { name: "November", num: 11 },
-    "12": { name: "December", num: 12 }, "dec": { name: "December", num: 12 }, "december": { name: "December", num: 12 },
-};
+const MONTH_NAMES = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+];
 
-function getMonthDetails(bom: PastPick["bookOfMonth"]): { name: string; num: number } {
-    const raw: unknown = bom?.monthLabel ?? bom?.month ?? (bom as Record<string, unknown>)?.[
-        "month_label"
-    ];
-
-    if (raw === undefined || raw === null) return { name: "Pick", num: 0 };
-
-    const key = String(raw).trim().toLowerCase();
-
-    if (MONTH_MAP[key]) {
-        return MONTH_MAP[key];
+function getMonthName(monthNumber: number): string {
+    if (monthNumber >= 1 && monthNumber <= 12) {
+        return MONTH_NAMES[monthNumber - 1];
     }
-
-    if (key.length > 0) {
-        return { name: key.charAt(0).toUpperCase() + key.slice(1), num: 0 };
-    }
-
-    return { name: "Pick", num: 0 };
+    return "Pick";
 }
 
-function getYearShort(bom: PastPick["bookOfMonth"]): string {
-    if (!bom?.year) return "26";
-    return String(bom.year).trim().slice(-2);
+function getYearShort(yearNumber: number): string {
+    if (!yearNumber) return "26";
+    return String(yearNumber).slice(-2);
 }
 
 export function PastPicks({ picks }: { picks: PastPick[] }) {
     if (!picks || picks.length === 0) return null;
 
-    // Sort picks: Most recent year first, then most recent month first
+    // Sort picks: Most recent year first (2026 > 2025), then most recent month first (8 > 7)
     const sortedPicks = [...picks].sort((a, b) => {
-        const yearA = Number(a.bookOfMonth?.year ?? 0);
-        const yearB = Number(b.bookOfMonth?.year ?? 0);
+        const yearA = a.bookOfMonth.year ?? 0;
+        const yearB = b.bookOfMonth.year ?? 0;
 
         if (yearA !== yearB) {
-            return yearB - yearA; // Descending year
+            return yearB - yearA; // Higher year first
         }
 
-        const monthA = getMonthDetails(a.bookOfMonth).num;
-        const monthB = getMonthDetails(b.bookOfMonth).num;
+        const monthA = a.bookOfMonth.month ?? 0;
+        const monthB = b.bookOfMonth.month ?? 0;
 
-        return monthB - monthA; // Descending month
+        return monthB - monthA; // Higher month number first (e.g. Aug = 8 before Jul = 7)
     });
 
     return (
@@ -86,15 +55,15 @@ export function PastPicks({ picks }: { picks: PastPick[] }) {
                 {/* Scrollable list */}
                 <div className="flex items-center gap-6 overflow-x-auto pb-4 scrollbar-thin">
                     {sortedPicks.map(({ book, bookOfMonth: bom }, idx) => {
-                        const { name: monthName } = getMonthDetails(bom);
-                        const yearShort = getYearShort(bom);
+                        const monthName = getMonthName(bom.month);
+                        const yearShort = getYearShort(bom.year);
                         const monthLabel = `${monthName} 20${yearShort}`;
 
                         return (
                             <Link
                                 key={idx}
                                 href={`/books/${book.slug}`}
-                                className="group relative shrink-0 w-[140px] sm:w-[160px] overflow-hidden border border-forest/10 bg-beige-dark shadow-md transition-all duration-300 hover:scale-105 hover:shadow-xl"
+                                className="group relative shrink-0 w-[140px] sm:w-[160px] overflow-hidden rounded-md border border-forest/10 bg-beige-dark shadow-md transition-all duration-300 hover:scale-105 hover:shadow-xl"
                             >
                                 {/* Cover Image Container */}
                                 <div className="relative aspect-[2/3] w-full overflow-hidden">
