@@ -18,26 +18,39 @@ interface PastPick {
     };
 }
 
-const MONTH_NAMES = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-];
+const MONTH_MAP: Record<string, { name: string; num: number }> = {
+    "1": { name: "January", num: 1 }, "01": { name: "January", num: 1 }, "jan": { name: "January", num: 1 }, "january": { name: "January", num: 1 },
+    "2": { name: "February", num: 2 }, "02": { name: "February", num: 2 }, "feb": { name: "February", num: 2 }, "february": { name: "February", num: 2 },
+    "3": { name: "March", num: 3 }, "03": { name: "March", num: 3 }, "mar": { name: "March", num: 3 }, "march": { name: "March", num: 3 },
+    "4": { name: "April", num: 4 }, "04": { name: "April", num: 4 }, "apr": { name: "April", num: 4 }, "april": { name: "April", num: 4 },
+    "5": { name: "May", num: 5 }, "05": { name: "May", num: 5 }, "may": { name: "May", num: 5 },
+    "6": { name: "June", num: 6 }, "06": { name: "June", num: 6 }, "jun": { name: "June", num: 6 }, "june": { name: "June", num: 6 },
+    "7": { name: "July", num: 7 }, "07": { name: "July", num: 7 }, "jul": { name: "July", num: 7 }, "july": { name: "July", num: 7 },
+    "8": { name: "August", num: 8 }, "08": { name: "August", num: 8 }, "aug": { name: "August", num: 8 }, "august": { name: "August", num: 8 },
+    "9": { name: "September", num: 9 }, "09": { name: "September", num: 9 }, "sep": { name: "September", num: 9 }, "september": { name: "September", num: 9 },
+    "10": { name: "October", num: 10 }, "oct": { name: "October", num: 10 }, "october": { name: "October", num: 10 },
+    "11": { name: "November", num: 11 }, "nov": { name: "November", num: 11 }, "november": { name: "November", num: 11 },
+    "12": { name: "December", num: 12 }, "dec": { name: "December", num: 12 }, "december": { name: "December", num: 12 },
+};
 
-function getMonthName(bom: PastPick["bookOfMonth"]): string {
-    const raw: unknown = bom?.month ?? bom?.monthLabel;
-    if (raw === undefined || raw === null) return "Pick";
+function getMonthDetails(bom: PastPick["bookOfMonth"]): { name: string; num: number } {
+    const raw: unknown = bom?.monthLabel ?? bom?.month ?? (bom as Record<string, unknown>)?.[
+        "month_label"
+    ];
 
-    const num = Number(raw);
-    if (!isNaN(num) && num >= 1 && num <= 12) {
-        return MONTH_NAMES[num - 1];
+    if (raw === undefined || raw === null) return { name: "Pick", num: 0 };
+
+    const key = String(raw).trim().toLowerCase();
+
+    if (MONTH_MAP[key]) {
+        return MONTH_MAP[key];
     }
 
-    const str = String(raw).trim();
-    if (str.length > 0 && isNaN(Number(str))) {
-        return str.charAt(0).toUpperCase() + str.slice(1);
+    if (key.length > 0) {
+        return { name: key.charAt(0).toUpperCase() + key.slice(1), num: 0 };
     }
 
-    return "Pick";
+    return { name: "Pick", num: 0 };
 }
 
 function getYearShort(bom: PastPick["bookOfMonth"]): string {
@@ -48,6 +61,21 @@ function getYearShort(bom: PastPick["bookOfMonth"]): string {
 export function PastPicks({ picks }: { picks: PastPick[] }) {
     if (!picks || picks.length === 0) return null;
 
+    // Sort picks: Most recent year first, then most recent month first
+    const sortedPicks = [...picks].sort((a, b) => {
+        const yearA = Number(a.bookOfMonth?.year ?? 0);
+        const yearB = Number(b.bookOfMonth?.year ?? 0);
+
+        if (yearA !== yearB) {
+            return yearB - yearA; // Descending year
+        }
+
+        const monthA = getMonthDetails(a.bookOfMonth).num;
+        const monthB = getMonthDetails(b.bookOfMonth).num;
+
+        return monthB - monthA; // Descending month
+    });
+
     return (
         <section className="border-t border-forest/10 bg-cream-dark/40 py-8">
             <div className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -57,8 +85,8 @@ export function PastPicks({ picks }: { picks: PastPick[] }) {
 
                 {/* Scrollable list */}
                 <div className="flex items-center gap-6 overflow-x-auto pb-4 scrollbar-thin">
-                    {picks.map(({ book, bookOfMonth: bom }, idx) => {
-                        const monthName = getMonthName(bom);
+                    {sortedPicks.map(({ book, bookOfMonth: bom }, idx) => {
+                        const { name: monthName } = getMonthDetails(bom);
                         const yearShort = getYearShort(bom);
                         const monthLabel = `${monthName} 20${yearShort}`;
 
