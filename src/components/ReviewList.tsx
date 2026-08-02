@@ -167,7 +167,7 @@ function ReviewItem({
                         className="border border-forest/20 px-3 py-2 rounded-lg text-sm text-forest"
                     />
                     <input
-                        value={twitter}
+                        value={twitter ?? ""}
                         onChange={(e) => setTwitter(e.target.value)}
                         className="border border-forest/20 px-3 py-2 rounded-lg text-sm text-forest"
                     />
