@@ -126,7 +126,7 @@ export function ReviewForm({ bookId, onSubmitted }: Props) {
                         Twitter/X username
                     </label>
                     <input
-                        value={twitter}
+                        value={twitter ?? ""}
                         onChange={(e) => setTwitter(e.target.value)}
                         placeholder="@twitter"
                         className="mt-1.5 w-full rounded-xl border border-forest/10 bg-forest/[0.04] px-3 py-2.5 font-display text-sm text-forest placeholder-forest/40 outline-none transition-colors focus:bg-forest/[0.06] focus:border-forest/20"
