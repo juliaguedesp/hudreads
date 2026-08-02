@@ -3,7 +3,10 @@ import { z } from "zod";
 export const reviewSchema = z.object({
     bookId: z.string().uuid(),
     name: z.string().min(1, "Name is required").max(100),
-    twitter: z.string().min(1, "Twitter handle is required").max(100),
+    twitter: z
+        .string()
+        .optional()
+        .transform((val) => (val ? val.replace(/^@/, "").trim() : "")),
     readingFormat: z
         .enum(["physical", "paperback", "hardcover", "ebook", "audiobook"])
         .optional()

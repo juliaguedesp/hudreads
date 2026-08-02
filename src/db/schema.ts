@@ -31,7 +31,7 @@ export const reviews = pgTable("reviews", {
         .references(() => books.id, { onDelete: "cascade" })
         .notNull(),
     name: varchar("name", { length: 100 }).notNull(),
-    twitter: varchar("twitter", { length: 100 }).notNull(),
+    twitter: varchar("twitter", { length: 100 }),
     readingFormat: varchar("reading_format", { length: 50 }),
     rating: numeric("rating", { precision: 2, scale: 1 }).notNull(),
     reviewText: text("review_text"),

@@ -55,12 +55,13 @@ export async function PATCH(
         const cleanReviewText = reviewText
             ? reviewText.replace(/&nbsp;/g, " ")
             : null;
+        const cleanTwitter = twitter ? twitter.replace(/^@/, "").trim() : "";
 
         const [updatedReview] = await db
             .update(reviews)
             .set({
                 name,
-                twitter,
+                twitter: cleanTwitter,
                 readingFormat,
                 rating: typeof rating === "number" ? rating.toFixed(1) : rating,
                 reviewText: cleanReviewText,

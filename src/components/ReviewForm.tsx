@@ -123,13 +123,12 @@ export function ReviewForm({ bookId, onSubmitted }: Props) {
                 </div>
                 <div>
                     <label className="rounded-xl block text-xs font-medium tracking-wider text-forest/70">
-                        Twitter/X username <span className="text-red-600">*</span>
+                        Twitter/X username
                     </label>
                     <input
                         value={twitter}
                         onChange={(e) => setTwitter(e.target.value)}
                         placeholder="@twitter"
-                        required
                         className="mt-1.5 w-full rounded-xl border border-forest/10 bg-forest/[0.04] px-3 py-2.5 font-display text-sm text-forest placeholder-forest/40 outline-none transition-colors focus:bg-forest/[0.06] focus:border-forest/20"
                     />
                 </div>

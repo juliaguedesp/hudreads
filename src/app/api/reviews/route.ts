@@ -57,8 +57,9 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Turnstile verification failed. Please try again." }, { status: 400 });
         }
 
-        // 5. Clean review text & generate edit token
+        // 5. Clean review text, twitter handle, & generate edit token
         const cleanReviewText = reviewText ? reviewText.replace(/&nbsp;/g, " ") : null;
+        const cleanTwitter = twitter ? twitter.replace(/^@/, "").trim() : "";
         const generatedToken = crypto.randomUUID();
 
         // 6. Insert into Database
@@ -67,7 +68,7 @@ export async function POST(req: Request) {
             .values({
                 bookId,
                 name,
-                twitter,
+                twitter: cleanTwitter,
                 readingFormat: readingFormat || null,
                 rating: rating.toFixed(1),
                 reviewText: cleanReviewText,

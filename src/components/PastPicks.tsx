@@ -63,7 +63,7 @@ export function PastPicks({ picks }: { picks: PastPick[] }) {
                             <Link
                                 key={idx}
                                 href={`/books/${book.slug}`}
-                                className="group relative shrink-0 w-[140px] sm:w-[160px] overflow-hidden rounded-md border border-forest/10 bg-beige-dark shadow-md transition-all duration-300 hover:scale-105 hover:shadow-xl"
+                                className="group relative shrink-0 w-[140px] sm:w-[160px] overflow-hidden border border-forest/10 bg-beige-dark shadow-md transition-all duration-300 hover:scale-105 hover:shadow-xl"
                             >
                                 {/* Cover Image Container */}
                                 <div className="relative aspect-[2/3] w-full overflow-hidden">
